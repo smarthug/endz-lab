@@ -5,7 +5,18 @@ import { VRButton } from "three/examples/jsm/webxr/VRButton.js";
 import { Water } from "three/examples/jsm/objects/Water.js";
 import { Sky } from "three/examples/jsm/objects/Sky.js";
 // import { install } from "@github/hotkey";
-import {useHotkey} from 'use-github-hotkey'
+import { useHotkey } from "use-github-hotkey";
+
+
+// this solves problem...
+// update user camera and its children
+
+// camera.position.copy( cameraVR.position );
+// camera.quaternion.copy( cameraVR.quaternion );
+// camera.scale.copy( cameraVR.scale );
+// camera.matrix.copy(cameraVR.matrix);
+// camera.matrixWorld.copy( cameraVR.matrixWorld );
+// camera.matrix.decompose(camera.position, camera.quaternion, camera.scale);
 
 CameraControls.install({ THREE: THREE });
 
@@ -20,11 +31,11 @@ export default function Main() {
   const canvasRef = useRef();
   const vrButtonConRef = useRef();
 
-//   const teleportBtnRef = useRef();
-//   const waterToggleBtnRef = useRef();
+  //   const teleportBtnRef = useRef();
+  //   const waterToggleBtnRef = useRef();
 
-  const setTeleportHotkey = useHotkey("t")
-  const setWaterToggleHotkey = useHotkey("w")
+  const setTeleportHotkey = useHotkey("t");
+  const setWaterToggleHotkey = useHotkey("w");
 
   useEffect(() => {
     Init();
@@ -46,7 +57,7 @@ export default function Main() {
     camera.position.z = 35;
     renderer = new THREE.WebGLRenderer({
       antialias: true,
-      canvas: canvasRef.current
+      canvas: canvasRef.current,
     });
     renderer.xr.enabled = true;
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -92,7 +103,7 @@ export default function Main() {
       sunColor: 0xffffff,
       waterColor: 0x001e0f,
       distortionScale: 3.7,
-      fog: scene.fog !== undefined
+      fog: scene.fog !== undefined,
     });
     //0x7F7F7F
     water.rotation.x = -Math.PI / 2;
@@ -115,7 +126,7 @@ export default function Main() {
 
     const parameters = {
       elevation: 2,
-      azimuth: 180
+      azimuth: 180,
     };
 
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
@@ -169,7 +180,7 @@ export default function Main() {
       style={{
         height: "100vh",
         overflowX: "hidden",
-        overflowY: "hidden"
+        overflowY: "hidden",
       }}
       ref={containerRef}
     >
