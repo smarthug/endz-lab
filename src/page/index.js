@@ -3,3 +3,4 @@
 // export * as Television from './television'
 export * as youtube from './youtube'
 export * as reactYoutube from './reactYoutube'
+export * as rotationExp from './rotationExp'
