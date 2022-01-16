@@ -100,11 +100,12 @@ function SceneInit() {
             // sunDirection: new THREE.Vector3(),
             sunDirection: new THREE.Vector3(100, 100, 100),
             sunColor: 0xffffff,
-            waterColor: "#000659",
+            waterColor: "#00aaff",
             distortionScale: 3.7,
             fog: scene.fog !== undefined
         }
     );
+    console.log(water)
     //0x7F7F7F
     water.rotation.x = - Math.PI / 2;
     // const waterBodyMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.62, color: 0x001e0f })
@@ -123,7 +124,7 @@ function SceneInit() {
 
     const sky = new Sky();
     sky.scale.setScalar(10000);
-    scene.add(sky);
+    // scene.add(sky);
 
     const skyUniforms = sky.material.uniforms;
 
@@ -197,6 +198,7 @@ function Init(canvasRef) {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     // renderer.setAnimationLoop(Tick)
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.setClearColor('#00aaff')
 
     //Controls
     controls = new OrbitControls(camera, canvas);
