@@ -19,20 +19,12 @@ const sizes = {
   height: window.innerHeight,
 };
 
-//Cursor
-const cursor = {
-  x: 0,
-  y: 0,
-};
-window.addEventListener("mousemove", (event) => {
-  cursor.x = event.clientX / sizes.width - 0.5;
-  cursor.y = -(event.clientY / sizes.height - 0.5);
-});
+
 
 export default function Main() {
   const canvasRef = useRef();
   const iframeRef = useRef();
-  const [isSoundOff, setSound] = useState(true);
+  const [isSound, setSound] = useState(false);
 
   useEffect(() => {
     // console.log("useEffect called");
@@ -76,8 +68,8 @@ export default function Main() {
     // theVideo.playVideo();
     // theVideo.pauseVideo();
 
-    isSoundOff ? theVideo.playVideo() : theVideo.pauseVideo();
-    setSound(!isSoundOff);
+    isSound ?  theVideo.pauseVideo() : theVideo.playVideo()
+    setSound(!isSound);
   }
 
   function Init() {
@@ -170,7 +162,7 @@ export default function Main() {
         }}
         onClick={play}
       >
-        {isSoundOff ? (
+        {isSound ? (
           <VolumeOff color="primary" fontSize="large" />
         ) : (
           <VolumeUp color="primary" fontSize="large" />
