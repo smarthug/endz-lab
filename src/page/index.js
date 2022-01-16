@@ -4,4 +4,5 @@
 // export * as youtube from './youtube'
 // export * as reactYoutube from './reactYoutube'
 // export * as rotationExp from './rotationExp'
-export * as MusicPlayerTest from './musicPlayerTest'
+// export * as MusicPlayerTest from './musicPlayerTest'
+export * as KameHouse from './kameHouse'
