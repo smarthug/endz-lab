@@ -54,6 +54,7 @@ function SceneInit() {
         // 1cm => 1m
         glb.scale.set(0.01, 0.01, 0.01)
         glb.position.set(0, 2.45, 0)
+        glb.castShadow = true
         scene.add(glb)
     })
 
@@ -62,15 +63,18 @@ function SceneInit() {
         // 1cm => 1m
         glb.scale.set(10, 10, 10)
         glb.position.set(0, 0.01, 0)
+        glb.receiveShadow = true
         scene.add(glb)
     })
 
     // grass
-    let grassGeometry = new THREE.CircleGeometry(7,8)
-    let grassMaterial = new THREE.MeshStandardMaterial({color:'green'})
+    let grassGeometry = new THREE.CircleGeometry(7, 8)
+    let grassMaterial = new THREE.MeshStandardMaterial({ color: 'green' })
     let grass = new THREE.Mesh(grassGeometry, grassMaterial)
     grass.rotation.x = -Math.PI * 0.5
     grass.position.y = 2.46
+    grass.receiveShadow = true
+    grassMaterial.roughness = 0.7
     scene.add(grass)
 
     // light setup 
@@ -85,9 +89,28 @@ function SceneInit() {
     gui.add(directionalLight.position, 'x').min(- 5).max(5).step(0.001)
     gui.add(directionalLight.position, 'y').min(- 5).max(5).step(0.001)
     gui.add(directionalLight.position, 'z').min(- 5).max(5).step(0.001)
+    directionalLight.castShadow = true
     scene.add(directionalLight)
 
     //hemisphere Light ...
+
+    // Spot light
+    const spotLight = new THREE.SpotLight(0xffffff, 0.3, 10, Math.PI * 0.3)
+
+    spotLight.castShadow = true
+    spotLight.shadow.mapSize.width = 1024
+    spotLight.shadow.mapSize.height = 1024
+    spotLight.shadow.camera.fov = 30
+    spotLight.shadow.camera.near = 1
+    spotLight.shadow.camera.far = 6
+
+    spotLight.position.set(0, 2, 2)
+    scene.add(spotLight)
+    scene.add(spotLight.target)
+
+    const spotLightCameraHelper = new THREE.CameraHelper(spotLight.shadow.camera)
+    spotLightCameraHelper.visible = false
+    scene.add(spotLightCameraHelper)
 
 
     // lil gui
@@ -138,7 +161,7 @@ function SceneInit() {
 
     // waterGroup.add(waterBody);
     waterGroup.add(water)
-    scene.add(waterGroup)
+    // scene.add(waterGroup)
 
     // Skybox
 
@@ -191,6 +214,9 @@ function Init(canvasRef) {
     const geometry = new THREE.BoxGeometry(1, 1, 1, 5, 5, 5);
     const material = new THREE.MeshNormalMaterial();
     mesh = new THREE.Mesh(geometry, material);
+    mesh.castShadow = true
+    mesh.receiveShadow = true
+    mesh.position.set(0, 5, 5)
     scene.add(mesh);
 
     // Camera
@@ -217,8 +243,9 @@ function Init(canvasRef) {
     renderer.setSize(sizes.width, sizes.height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     // renderer.setAnimationLoop(Tick)
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    // renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.setClearColor('#00aaff')
+    renderer.shadowMap.enabled = true
 
     //Controls
     controls = new OrbitControls(camera, canvas);
