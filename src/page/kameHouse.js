@@ -53,8 +53,25 @@ function SceneInit() {
         // 1cm 단위로 작업했나봄 ,
         // 1cm => 1m
         glb.scale.set(0.01, 0.01, 0.01)
+        glb.position.set(0, 2.45, 0)
         scene.add(glb)
     })
+
+    glbLoader('/models/ground.glb').then((glb) => {
+        // 1cm 단위로 작업했나봄 ,
+        // 1cm => 1m
+        glb.scale.set(10, 10, 10)
+        glb.position.set(0, 0.01, 0)
+        scene.add(glb)
+    })
+
+    // grass
+    let grassGeometry = new THREE.CircleGeometry(7,8)
+    let grassMaterial = new THREE.MeshStandardMaterial({color:'green'})
+    let grass = new THREE.Mesh(grassGeometry, grassMaterial)
+    grass.rotation.x = -Math.PI * 0.5
+    grass.position.y = 2.46
+    scene.add(grass)
 
     // light setup 
     let ambientLight = new THREE.AmbientLight('#ffffff', 0.5)
@@ -65,6 +82,9 @@ function SceneInit() {
     let directionalLight = new THREE.DirectionalLight('#ffffff', 0.5)
     gui.addColor(directionalLight, 'color')
     gui.add(directionalLight, 'intensity').min(0).max(1).step(0.001)
+    gui.add(directionalLight.position, 'x').min(- 5).max(5).step(0.001)
+    gui.add(directionalLight.position, 'y').min(- 5).max(5).step(0.001)
+    gui.add(directionalLight.position, 'z').min(- 5).max(5).step(0.001)
     scene.add(directionalLight)
 
     //hemisphere Light ...
