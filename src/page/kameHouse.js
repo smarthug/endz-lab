@@ -55,6 +55,9 @@ function SceneInit() {
         glb.scale.set(0.01, 0.01, 0.01)
         glb.position.set(0, 2.45, 0)
         glb.castShadow = true
+        glb.receiveShadow = true
+        console.log(glb)
+        recursiveShadowToggle(glb)
         scene.add(glb)
     })
 
@@ -90,7 +93,24 @@ function SceneInit() {
     gui.add(directionalLight.position, 'y').min(- 5).max(5).step(0.001)
     gui.add(directionalLight.position, 'z').min(- 5).max(5).step(0.001)
     directionalLight.castShadow = true
+    directionalLight.position.set(5, 5, 5)
     scene.add(directionalLight)
+
+    directionalLight.shadow.mapSize.width = 1024;
+    directionalLight.shadow.mapSize.height = 1024;
+    directionalLight.shadow.camera.top = 20
+    directionalLight.shadow.camera.right = 20
+    directionalLight.shadow.camera.bottom = -20
+    directionalLight.shadow.camera.left = -20
+    directionalLight.shadow.camera.near = 1;
+    directionalLight.shadow.camera.far = 60;
+    // directionalLight.shadow.radius = 10
+
+    const directionalLightCameraHelper = new THREE.CameraHelper(
+        directionalLight.shadow.camera
+    );
+    scene.add(directionalLightCameraHelper);
+    directionalLightCameraHelper.visible = true
 
     //hemisphere Light ...
 
@@ -161,13 +181,13 @@ function SceneInit() {
 
     // waterGroup.add(waterBody);
     waterGroup.add(water)
-    // scene.add(waterGroup)
+    scene.add(waterGroup)
 
     // Skybox
 
     const sky = new Sky();
     sky.scale.setScalar(10000);
-    // scene.add(sky);
+    scene.add(sky);
 
     const skyUniforms = sky.material.uniforms;
 
@@ -212,7 +232,8 @@ function SceneInit() {
 function Init(canvasRef) {
 
     const geometry = new THREE.BoxGeometry(1, 1, 1, 5, 5, 5);
-    const material = new THREE.MeshNormalMaterial();
+    const material = new THREE.MeshStandardMaterial();
+    material.roughness = 0.7
     mesh = new THREE.Mesh(geometry, material);
     mesh.castShadow = true
     mesh.receiveShadow = true
@@ -280,4 +301,15 @@ function Tick() {
 
     // Call tick again on the next frame
     requestAnimationFrame(Tick);
+}
+
+
+function recursiveShadowToggle(obj) {
+
+    obj.receiveShadow = true;
+    obj.castShadow = true
+    obj.children.map((v, i) => {
+        recursiveShadowToggle(v)
+    })
+
 }
