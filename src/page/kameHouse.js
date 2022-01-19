@@ -17,6 +17,38 @@ const scene = new THREE.Scene();
 
 const clock = new THREE.Clock();
 
+const cubeTextureLoader = new THREE.CubeTextureLoader()
+// cubeTextureLoader.setPath('textures/cubeMaps/sky/')
+// scene.background = cubeTextureLoader.setPath('textures/cubeMaps/sky/').load([
+//     'px.png',
+//     'nx.png',
+//     'py.png',
+//     'ny.png',
+//     'pz.png',
+//     'nz.png'
+// ])
+
+scene.background = cubeTextureLoader.setPath('textures/cubeMaps/toonSky/').load([
+    'px.png',
+    'nx.png',
+    'py.png',
+    'ny.png',
+    'pz.png',
+    'nz.png'
+])
+
+
+// scene.background = cubeTextureLoader.load([
+//     'px.png',
+//     'nx.png',
+//     'py.png',
+//     'ny.png',
+//     'pz.png',
+//     'nz.png'
+// ])
+console.log("wtf")
+// console.log(background)
+
 // Sizes
 const sizes = {
     width: window.innerWidth,
@@ -187,7 +219,7 @@ function SceneInit() {
 
     const sky = new Sky();
     sky.scale.setScalar(10000);
-    scene.add(sky);
+    // scene.add(sky);
 
     const skyUniforms = sky.material.uniforms;
 
@@ -265,7 +297,7 @@ function Init(canvasRef) {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     // renderer.setAnimationLoop(Tick)
     // renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.setClearColor('#00aaff')
+    // renderer.setClearColor('#00aaff')
     renderer.shadowMap.enabled = true
 
     //Controls
