@@ -142,11 +142,11 @@ function SceneInit() {
         directionalLight.shadow.camera
     );
     scene.add(directionalLightCameraHelper);
-    directionalLightCameraHelper.visible = true
+    directionalLightCameraHelper.visible = false
 
     //hemisphere Light ...
 
-    const hemisphereLight = new THREE.HemisphereLight(0xff0000, 0x0000ff, 0.3);
+    const hemisphereLight = new THREE.HemisphereLight(0xf7b1b1, 0x2be228, 0.3);
     scene.add(hemisphereLight);
     let hemisphereLightFolder = gui.addFolder("hemisphereLight");
     hemisphereLightFolder.addColor(hemisphereLight, "color").name("skyColor");
@@ -157,10 +157,10 @@ function SceneInit() {
         .max(1)
         .step(0.001);
     const hemisphereLightHelper = new THREE.HemisphereLightHelper(
-      hemisphereLight,
-      5
+        hemisphereLight,
+        5
     );
-    scene.add(hemisphereLightHelper);
+    // scene.add(hemisphereLightHelper);
 
     // Spot light
     const spotLight = new THREE.SpotLight(0xffffff, 0.3, 10, Math.PI * 0.3)
@@ -286,7 +286,7 @@ function Init(canvasRef) {
     mesh.castShadow = true
     mesh.receiveShadow = true
     mesh.position.set(0, 5, 5)
-    scene.add(mesh);
+    // scene.add(mesh);
 
     // Camera
     camera = new THREE.PerspectiveCamera(
