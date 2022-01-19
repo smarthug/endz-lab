@@ -146,6 +146,22 @@ function SceneInit() {
 
     //hemisphere Light ...
 
+    const hemisphereLight = new THREE.HemisphereLight(0xff0000, 0x0000ff, 0.3);
+    scene.add(hemisphereLight);
+    let hemisphereLightFolder = gui.addFolder("hemisphereLight");
+    hemisphereLightFolder.addColor(hemisphereLight, "color").name("skyColor");
+    hemisphereLightFolder.addColor(hemisphereLight, "groundColor");
+    hemisphereLightFolder
+        .add(hemisphereLight, "intensity")
+        .min(0)
+        .max(1)
+        .step(0.001);
+    const hemisphereLightHelper = new THREE.HemisphereLightHelper(
+      hemisphereLight,
+      5
+    );
+    scene.add(hemisphereLightHelper);
+
     // Spot light
     const spotLight = new THREE.SpotLight(0xffffff, 0.3, 10, Math.PI * 0.3)
 
