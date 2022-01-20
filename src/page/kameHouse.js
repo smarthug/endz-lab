@@ -11,15 +11,25 @@ import { Sky } from "three/examples/jsm/objects/Sky.js";
 let mesh, renderer, camera, controls;
 
 const gui = new GUI();
+gui.close()
 
 //scene
 const scene = new THREE.Scene();
 
-const clock = new THREE.Clock();
+// const clock = new THREE.Clock();
 
 const cubeTextureLoader = new THREE.CubeTextureLoader()
 // cubeTextureLoader.setPath('textures/cubeMaps/sky/')
 // scene.background = cubeTextureLoader.setPath('textures/cubeMaps/sky/').load([
+//     'px.png',
+//     'nx.png',
+//     'py.png',
+//     'ny.png',
+//     'pz.png',
+//     'nz.png'
+// ])
+
+// scene.background = cubeTextureLoader.setPath('textures/cubeMaps/toonSky/').load([
 //     'px.png',
 //     'nx.png',
 //     'py.png',
@@ -56,7 +66,7 @@ const sizes = {
 };
 
 let water, sun;
-let waterBody
+// let waterBody
 let waterGroup
 
 
@@ -99,7 +109,30 @@ function SceneInit() {
         glb.scale.set(10, 10, 10)
         glb.position.set(0, 0.01, 0)
         glb.receiveShadow = true
+        recursiveShadowToggle(glb)
         scene.add(glb)
+    })
+
+    glbLoader('/models/palm.glb').then((glb) => {
+        // 1cm 단위로 작업했나봄 ,
+        // 1cm => 1m
+        glb.scale.set(3, 3, 3)
+        glb.position.set(4, 2.4, 0)
+        // glb.receiveShadow = true
+        recursiveShadowToggle(glb)
+        scene.add(glb)
+
+        const secondPalm = glb.clone()
+
+        secondPalm.position.set(-4, 2.2, 4)
+        secondPalm.rotation.y = Math.PI
+        scene.add(secondPalm)
+
+        const thirdPalm = glb.clone()
+
+        thirdPalm.position.set(-4, 2.0, -4)
+        thirdPalm.rotation.y = Math.PI / 2
+        scene.add(thirdPalm)
     })
 
     // grass
@@ -156,10 +189,10 @@ function SceneInit() {
         .min(0)
         .max(1)
         .step(0.001);
-    const hemisphereLightHelper = new THREE.HemisphereLightHelper(
-        hemisphereLight,
-        5
-    );
+    // const hemisphereLightHelper = new THREE.HemisphereLightHelper(
+    //     hemisphereLight,
+    //     5
+    // );
     // scene.add(hemisphereLightHelper);
 
     // Spot light
@@ -270,8 +303,11 @@ function SceneInit() {
 
 
     const folderSky = gui.addFolder('Sky');
-    let elevationController = folderSky.add(parameters, 'elevation', 0, 90, 0.1).onChange(updateSun);
-    let azimuthController = folderSky.add(parameters, 'azimuth', - 180, 180, 0.1).onChange(updateSun);
+    // let elevationController = folderSky.add(parameters, 'elevation', 0, 90, 0.1).onChange(updateSun);
+    // let azimuthController = folderSky.add(parameters, 'azimuth', - 180, 180, 0.1).onChange(updateSun);
+
+    folderSky.add(parameters, 'elevation', 0, 90, 0.1).onChange(updateSun);
+    folderSky.add(parameters, 'azimuth', - 180, 180, 0.1).onChange(updateSun);
 
 }
 
@@ -336,7 +372,7 @@ function Init(canvasRef) {
 }
 
 function Tick() {
-    const elapsedTime = clock.getElapsedTime();
+    // const elapsedTime = clock.getElapsedTime();
 
     // Update controls
     controls.update();
@@ -356,8 +392,10 @@ function recursiveShadowToggle(obj) {
 
     obj.receiveShadow = true;
     obj.castShadow = true
+
     obj.children.map((v, i) => {
         recursiveShadowToggle(v)
+        return null
     })
 
 }

@@ -25,7 +25,7 @@ export default function MusicPlayer({ videoId }) {
                 style={{
                     position: "absolute",
                     top: 0,
-                    right: 0,
+                    left: 0,
                     zIndex: 999,
                 }}
                 onClick={toggleMusic}
