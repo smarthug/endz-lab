@@ -7,3 +7,4 @@
 // export * as MusicPlayerTest from './musicPlayerTest'
 export * as KameHouse from './kameHouse'
 // export * as shadowTest from './shadowTest'
+export * as MyUniverse from './myUniverse'
