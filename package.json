@@ -11,6 +11,7 @@
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
     "camera-controls": "^1.33.1",
+    "cannon-es": "^0.19.0",
     "lil-gui": "^0.16.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -18,6 +19,7 @@
     "react-scripts": "4.0.3",
     "react-youtube": "^7.13.1",
     "three": "^0.135.0",
+    "three-to-cannon": "^4.0.2",
     "use-github-hotkey": "^1.0.4",
     "web-vitals": "^1.1.2"
   },

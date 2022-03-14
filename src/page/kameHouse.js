@@ -158,6 +158,7 @@ function SceneInit() {
     gui.add(directionalLight.position, 'y').min(- 5).max(5).step(0.001)
     gui.add(directionalLight.position, 'z').min(- 5).max(5).step(0.001)
     directionalLight.castShadow = true
+    directionalLight.shadow.normalBias = 0.11
     directionalLight.position.set(5, 5, 5)
     scene.add(directionalLight)
 
@@ -347,10 +348,12 @@ function Init(canvasRef) {
     });
     renderer.setSize(sizes.width, sizes.height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    // renderer.setAnimationLoop(Tick)
-    // renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    // renderer.setClearColor('#00aaff')
+    renderer.physicallyCorrectLights = true
+    renderer.outputEncoding = THREE.sRGBEncoding
+    renderer.toneMapping = THREE.ACESFilmicToneMapping
+    renderer.toneMappingExposure = 3
     renderer.shadowMap.enabled = true
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
     //Controls
     controls = new OrbitControls(camera, canvas);

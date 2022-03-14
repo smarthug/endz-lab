@@ -8,3 +8,4 @@
 export * as KameHouse from './kameHouse'
 // export * as shadowTest from './shadowTest'
 export * as MyUniverse from './myUniverse'
+export * as PysicsGame from './physicsGame'
