@@ -9,6 +9,8 @@ import { threeToCannon, ShapeType } from 'three-to-cannon';
 
 let renderer, camera, controls;
 
+
+
 /**
  * Base
  */
@@ -33,6 +35,12 @@ debugObject.createBox = () => {
         })
 }
 gui.add(debugObject, 'createBox')
+
+debugObject.dropTheBall = () => {
+    dropTheBall(1, { x: 0, y: 4, z: 0 })
+}
+
+gui.add(debugObject, 'dropTheBall')
 
 debugObject.reset = () => {
     for (const object of objectsToUpdate) {
@@ -80,11 +88,11 @@ const playHitSound = (collision) => {
     const impactStrength = collision.contact.getImpactVelocityAlongNormal()
     if (impactStrength > 1.5) {
         // hitSound.volume = Math.random()
-        console.log(impactStrength)
+        // console.log(impactStrength)
         // hitSound.volume = impactStrength /20
-        hitSound.volume = impactStrength / 30
-        hitSound.currentTime = 0
-        hitSound.play()
+        // hitSound.volume = impactStrength / 30
+        // hitSound.currentTime = 0
+        // hitSound.play()
     }
 }
 
@@ -101,6 +109,7 @@ world.gravity.set(0, -9.82, 0)
 const defaultMaterial = new CANNON.Material('default')
 // const concreteMaterial = new CANNON.Material('concrete')
 // const plasticMaterial = new CANNON.Material('plastic')
+const ballMaterial = new CANNON.Material('ball')
 
 const defaultContactMaterial = new CANNON.ContactMaterial(
     defaultMaterial,
@@ -112,6 +121,30 @@ const defaultContactMaterial = new CANNON.ContactMaterial(
 )
 world.addContactMaterial(defaultContactMaterial)
 world.defaultContactMaterial = defaultContactMaterial
+
+const ballContactMaterial = new CANNON.ContactMaterial(
+    defaultMaterial,
+    ballMaterial,
+    {
+        friction: 0.1,
+        restitution: 1.5
+    }
+)
+
+
+world.addContactMaterial(ballContactMaterial)
+
+
+// const concretePlasticContactMaterial = new CANNON.ContactMaterial(
+//     defaultMaterial,
+//     ballMaterial,
+//     {
+//         friction: 0.1,
+//         restitution: 1.7
+//     }
+// )
+// world.addContactMaterial(concretePlasticContactMaterial)
+// world.defaultContactMaterial = concretePlasticContactMaterial
 
 
 // Sphere
@@ -159,8 +192,24 @@ const tmpPosition = { x: 0, y: 1, z: 0 }
 /**
  * movingFloor
  */
+// const movingFloor = new THREE.Mesh(
+//     new THREE.BoxGeometry(1, 1),
+//     new THREE.MeshStandardMaterial({
+//         color: '#777777',
+//         metalness: 0.3,
+//         roughness: 0.4,
+//         envMap: environmentMapTexture,
+//         envMapIntensity: 0.5
+//     })
+// )
+// movingFloor.position.copy(tmpPosition)
+// movingFloor.receiveShadow = true
+// movingFloor.rotation.x = - Math.PI * 0.5
+// scene.add(movingFloor)
+
 const movingFloor = new THREE.Mesh(
-    new THREE.BoxGeometry(1, 1),
+    // Sphere
+    new THREE.SphereGeometry(1, 20, 20),
     new THREE.MeshStandardMaterial({
         color: '#777777',
         metalness: 0.3,
@@ -179,7 +228,9 @@ const result = threeToCannon(movingFloor);
 
 // Floor
 // const movingFloorShape = new CANNON.Box(new CANNON.Vec3(1,1,1))
-const movingFloorBody = new CANNON.Body()
+const movingFloorBody = new CANNON.Body({
+    material: ballMaterial
+})
 movingFloorBody.mass = 0
 movingFloorBody.position.copy(tmpPosition)
 movingFloorBody.addShape(result.shape)
@@ -198,8 +249,8 @@ gui.add(debugObject, "z").min(-10).max(10).step(0.001).onChange((z) => {
 
 
 function moveBox(elapsedTime) {
-    movingFloor.position.x = Math.sin(elapsedTime)*5;
-    movingFloorBody.position.x = Math.sin(elapsedTime)*5;
+    movingFloor.position.x = Math.sin(elapsedTime) * 5;
+    movingFloorBody.position.x = Math.sin(elapsedTime) * 5;
 }
 
 // const createBox = (width, height, depth, position) => {
@@ -332,6 +383,39 @@ const createBox = (width, height, depth, position) => {
         mass: 1,
         position: new CANNON.Vec3(0, 3, 0),
         shape: shape,
+        material: defaultMaterial
+    })
+    body.position.copy(position)
+    body.addEventListener('collide', playHitSound)
+    world.addBody(body)
+
+    // Save in objects to update
+    objectsToUpdate.push({
+        mesh: mesh,
+        body: body
+    })
+}
+
+const dropTheBall = (radius, position) => {
+
+    // THREE.js mesh
+    const mesh = new THREE.Mesh(
+        sphereGeometry,
+        sphereMaterial
+    )
+    mesh.scale.set(radius, radius, radius)
+    mesh.castShadow = true
+    mesh.position.copy(position)
+    scene.add(mesh)
+
+    // Cannon.js body
+    const shape = new CANNON.Sphere(radius)
+
+    const body = new CANNON.Body({
+        mass: 1,
+        position: new CANNON.Vec3(0, 3, 0),
+        shape: shape,
+        // material: concreteMaterial
         material: defaultMaterial
     })
     body.position.copy(position)
