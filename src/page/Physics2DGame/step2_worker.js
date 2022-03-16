@@ -6,7 +6,6 @@ import p2 from 'p2-es'
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import worker from 'workerize-loader!./worker'
-import { initWorld } from "./worker";
 
 let instance = worker()  // `new` is optional
 
@@ -16,7 +15,7 @@ let instance = worker()  // `new` is optional
 
 let renderer, camera, controls;
 // let array = new Float32Array(6);
-let array = [];
+// let array = [];
 /**
  * Base
  */
@@ -72,7 +71,19 @@ debugObject.test = () => {
 }
 gui.add(debugObject, 'test')
 
+// debugObject.reset = () => {
+//     for (const object of objectsToUpdate) {
+//         // Remove
+//         instance.removeBody(object.body)
 
+//         // Remove mesh
+//         scene.remove(object.mesh)
+
+
+//     }
+//     objectsToUpdate.splice(0, objectsToUpdate.length)
+// }
+// gui.add(debugObject, 'reset')
 
 
 
@@ -138,7 +149,8 @@ export default function Main() {
 
     function sceneInit() {
 
-        instance.initWorld(array);
+        // instance.initWorld(array);
+        instance.initWorld();
 
 
         //

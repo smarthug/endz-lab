@@ -1,20 +1,24 @@
 import p2 from 'p2-es'
 
 let world = null;
-let array = null;
+let array = [];
 
 //material
 const boxMaterial = new p2.Material()
 const platform1Material = new p2.Material();
 const platform2Material = new p2.Material();
 
-export function initWorld(test) {
+export function removeBody(body){
+    world.removeBody(body)
+}
+
+export function initWorld() {
     // Create a physics world, where bodies and constraints live
     world = new p2.World({
         gravity: [0, -9.82]
     });
 
-    array = test
+    
 
     // Create an infinite ground plane body
     var groundBody = new p2.Body({
