@@ -226,8 +226,13 @@ function createMovingPlatform({ width, height, depth }, { x, y }, shapeMaterial)
 
 createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: 1, y: 7 }, platform1Material)
 
-
-
+setInterval(() => {
+    createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 7 })
+}, 100)
+debugObject.test = () => {
+    console.log(objectsToUpdate.length);
+}
+gui.add(debugObject, 'test')
 var contactMaterial1 = new p2.ContactMaterial(boxShape.material, platformShape1.material, {
     surfaceVelocity: -0.5,
 });
