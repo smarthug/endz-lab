@@ -11,6 +11,7 @@ let renderer, camera, controls;
  */
 // Debug
 const gui = new GUI()
+const debugObject = {}
 
 // Scene
 const scene = new THREE.Scene()
@@ -137,11 +138,15 @@ function createBox({ width, height, depth }, { x, y }) {
 
 createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 7 })
 createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 12 })
-createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 24 })
-createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 37 })
+// createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 24 })
+// createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 37 })
 // createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 47 })
 // createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 57 })
 // createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 67 })
+debugObject.createBox = ()=>{
+    createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 5 })
+}
+gui.add(debugObject, 'createBox')
 
 
 
