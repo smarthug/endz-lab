@@ -246,7 +246,9 @@ export default function Main() {
         for (const object of objectsToUpdate) {
             // object.mesh.position.copy(object.body.position)
             // console.log(object)
-            object.mesh.position.set(object.body.position[0], object.body.position[1], 0)
+            object.mesh.position.set(object.body.interpolatedPosition[0], object.body.interpolatedPosition[1], 0)
+            object.mesh.rotation.z =object.body.interpolatedAngle
+            // console.log(object.body.interpolatedAngle)
             // object.mesh.quaternion.copy(object.body.quaternion)
             // object.mesh.quaternion.copy(object.body.quaternion)
         }
