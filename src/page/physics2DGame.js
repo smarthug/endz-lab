@@ -82,6 +82,8 @@ const ground = new THREE.Mesh(
 ground.rotation.x = -Math.PI * 0.5
 scene.add(ground)
 
+//material
+const boxMaterial = new p2.Material()
 
 // Create moving box
 var boxBody = new p2.Body({
@@ -91,7 +93,7 @@ var boxBody = new p2.Body({
     boxShape = new p2.Box({
         width: 0.5,
         height: 0.5,
-        material: new p2.Material()
+        material: boxMaterial
     });
 boxBody.addShape(boxShape);
 world.addBody(boxBody);
@@ -106,6 +108,40 @@ objectsToUpdate.push({
     mesh: box,
     body: boxBody
 })
+
+function createBox({ width, height, depth }, { x, y }) {
+    // Create moving box
+    let boxBody = new p2.Body({
+        mass: 1,
+        position: [x, y]
+    }),
+        boxShape = new p2.Box({
+            width: width,
+            height: height,
+            material: boxMaterial
+        });
+    boxBody.addShape(boxShape);
+    world.addBody(boxBody);
+
+    let box = new THREE.Mesh(
+        new THREE.BoxGeometry(width, height, depth),
+        new THREE.MeshNormalMaterial()
+    )
+    box.position.set(x, y, 0);
+    scene.add(box)
+    objectsToUpdate.push({
+        mesh: box,
+        body: boxBody
+    })
+}
+
+createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 7 })
+createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 12 })
+createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 24 })
+createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 37 })
+// createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 47 })
+// createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 57 })
+// createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 67 })
 
 
 
@@ -206,7 +242,7 @@ export default function Main() {
 
         renderer = new THREE.WebGLRenderer({
             canvas: canvas,
-            antialias:true
+            antialias: true
         });
         renderer.setSize(sizes.width, sizes.height);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -247,7 +283,7 @@ export default function Main() {
             // object.mesh.position.copy(object.body.position)
             // console.log(object)
             object.mesh.position.set(object.body.interpolatedPosition[0], object.body.interpolatedPosition[1], 0)
-            object.mesh.rotation.z =object.body.interpolatedAngle
+            object.mesh.rotation.z = object.body.interpolatedAngle
             // console.log(object.body.interpolatedAngle)
             // object.mesh.quaternion.copy(object.body.quaternion)
             // object.mesh.quaternion.copy(object.body.quaternion)
