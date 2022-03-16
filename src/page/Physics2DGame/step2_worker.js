@@ -4,6 +4,15 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import GUI from "lil-gui";
 import p2 from 'p2-es'
 
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import worker from 'workerize-loader!./worker'
+
+let instance = worker()  // `new` is optional
+
+instance.expensive(1000).then( count => {
+    console.log(`Ran ${count} loops`)
+})
+
 let renderer, camera, controls;
 
 /**
