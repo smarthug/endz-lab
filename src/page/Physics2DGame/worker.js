@@ -1,7 +1,9 @@
 import p2 from 'p2-es'
 
 let world = null;
-let array = [];
+const array = [];
+
+const objectsToUpdate = []
 
 //material
 const boxMaterial = new p2.Material()
@@ -10,6 +12,13 @@ const platform2Material = new p2.Material();
 
 export function removeBody(body){
     world.removeBody(body)
+}
+
+export function reset(){
+    for(const body of objectsToUpdate){
+        world.removeBody(body);
+    }
+    objectsToUpdate.splice(0, objectsToUpdate.length)
 }
 
 export function initWorld() {
@@ -65,9 +74,17 @@ export function tick(deltaTime) {
     //     // object.mesh.quaternion.copy(object.body.quaternion)
     // }
     // console.log(world.bodies)
-    for(var i=0; i!==world.bodies.length; i++){
+    // for(var i=0; i!==world.bodies.length; i++){
         
-        var b = world.bodies[i];
+    //     var b = world.bodies[i];
+    //     array[3*i + 0] = b.position[0];
+    //     array[3*i + 1] = b.position[1];
+    //     array[3*i + 2] = b.angle;
+    // }
+
+    for(let i=0; i!==objectsToUpdate.length; i++){
+        
+        let b = objectsToUpdate[i];
         array[3*i + 0] = b.position[0];
         array[3*i + 1] = b.position[1];
         array[3*i + 2] = b.angle;
@@ -90,7 +107,7 @@ export function createBox({ width, height, depth }, { x, y }) {
         });
     boxBody.addShape(boxShape);
     world.addBody(boxBody);
-
+    objectsToUpdate.push(boxBody)
     // let box = new THREE.Mesh(
     //     new THREE.BoxGeometry(width, height, depth),
     //     new THREE.MeshNormalMaterial()
