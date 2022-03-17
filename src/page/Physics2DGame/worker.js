@@ -10,12 +10,12 @@ const boxMaterial = new p2.Material()
 const platform1Material = new p2.Material();
 const platform2Material = new p2.Material();
 
-export function removeBody(body){
+export function removeBody(body) {
     world.removeBody(body)
 }
 
-export function reset(){
-    for(const body of objectsToUpdate){
+export function reset() {
+    for (const body of objectsToUpdate) {
         world.removeBody(body);
     }
     objectsToUpdate.splice(0, objectsToUpdate.length)
@@ -27,7 +27,7 @@ export function initWorld() {
         gravity: [0, -9.82]
     });
 
-    
+
 
     // Create an infinite ground plane body
     var groundBody = new p2.Body({
@@ -75,19 +75,19 @@ export function tick(deltaTime) {
     // }
     // console.log(world.bodies)
     // for(var i=0; i!==world.bodies.length; i++){
-        
+
     //     var b = world.bodies[i];
     //     array[3*i + 0] = b.position[0];
     //     array[3*i + 1] = b.position[1];
     //     array[3*i + 2] = b.angle;
     // }
 
-    for(let i=0; i!==objectsToUpdate.length; i++){
-        
+    for (let i = 0; i !== objectsToUpdate.length; i++) {
+
         let b = objectsToUpdate[i];
-        array[3*i + 0] = b.position[0];
-        array[3*i + 1] = b.position[1];
-        array[3*i + 2] = b.angle;
+        array[3 * i + 0] = b.position[0];
+        array[3 * i + 1] = b.position[1];
+        array[3 * i + 2] = b.angle;
     }
 
     return array
@@ -108,6 +108,25 @@ export function createBox({ width, height, depth }, { x, y }) {
     boxBody.addShape(boxShape);
     world.addBody(boxBody);
     objectsToUpdate.push(boxBody)
+
+}
+
+export function createMovingPlatform({ width, height, depth }, { x, y }, right) {
+    // Create moving box
+    let boxBody = new p2.Body({
+        mass: 0,
+        position: [x, y]
+    }),
+        boxShape = new p2.Box({
+            width: width,
+            height: height,
+            material: right ? platform1Material : platform2Material
+        });
+    boxBody.addShape(boxShape);
+    world.addBody(boxBody);
+
+    // objectsToUpdate.push(boxBody)
+
     // let box = new THREE.Mesh(
     //     new THREE.BoxGeometry(width, height, depth),
     //     new THREE.MeshNormalMaterial()
@@ -151,4 +170,3 @@ export function createBox({ width, height, depth }, { x, y }) {
 // x, y , angle ?? 이런 시스템으로 갈까 ???
 // world
 // array 하나를 싱크로 하네 ...
- 
