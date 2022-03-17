@@ -35,6 +35,15 @@ const objectsToUpdate = [];
  * Textures
  */
 const textureLoader = new THREE.TextureLoader()
+const matcap1 = textureLoader.load('/textures/matcaps/1.png')
+const matcap2 = textureLoader.load('/textures/matcaps/2.png')
+const matcap3 = textureLoader.load('/textures/matcaps/3.png')
+const matcap4 = textureLoader.load('/textures/matcaps/4.png')
+const matcap5 = textureLoader.load('/textures/matcaps/5.png')
+const matcap6 = textureLoader.load('/textures/matcaps/6.png')
+const matcap7 = textureLoader.load('/textures/matcaps/7.png')
+const matcap8 = textureLoader.load('/textures/matcaps/8.png')
+console.log(matcap1)
 
 
 /**
@@ -50,8 +59,9 @@ const sizes = {
 
 const ground = new THREE.Mesh(
     new THREE.PlaneGeometry(10, 10),
-    new THREE.MeshNormalMaterial({
-        side: THREE.DoubleSide
+    new THREE.MeshMatcapMaterial({
+        side: THREE.DoubleSide,
+        matcap: matcap1
     })
 )
 ground.rotation.x = -Math.PI * 0.5
@@ -197,13 +207,30 @@ export default function Main() {
 
     // const boxGeo = new THREE.BoxGeometry(width, height, depth)
     const boxGeo = new THREE.BoxGeometry(0.5, 0.5, 0.5)
-    const boxMat = new THREE.MeshNormalMaterial()
+    const boxMat1 = new THREE.MeshMatcapMaterial({ matcap: matcap1 })
+    const boxMat2 = new THREE.MeshMatcapMaterial({ matcap: matcap2 })
+    const boxMat3 = new THREE.MeshMatcapMaterial({ matcap: matcap3 })
+    const boxMat4 = new THREE.MeshMatcapMaterial({ matcap: matcap4 })
+    const boxMat5 = new THREE.MeshMatcapMaterial({ matcap: matcap5 })
+    const boxMat6 = new THREE.MeshMatcapMaterial({ matcap: matcap6 })
+    const boxMat7 = new THREE.MeshMatcapMaterial({ matcap: matcap7 })
+    const boxMat8 = new THREE.MeshMatcapMaterial({ matcap: matcap8 })
+    const matcapArray = [
+        boxMat1,
+        boxMat2,
+        boxMat3,
+        boxMat4,
+        boxMat5,
+        boxMat6,
+        boxMat7,
+        boxMat8,
+    ]
     function createBox({ width, height, depth }, { x, y }) {
         instance.createBox({ width, height, depth }, { x, y }).then(() => {
 
             let box = new THREE.Mesh(
                 boxGeo,
-                boxMat
+                matcapArray[objectsToUpdate.length%8]
             )
             box.position.set(x, y, 0);
             scene.add(box)
@@ -215,7 +242,7 @@ export default function Main() {
         instance.createMovingPlatform({ width, height, depth }, { x, y }, right).then(() => {
             let box = new THREE.Mesh(
                 new THREE.BoxGeometry(width, height, depth),
-                new THREE.MeshNormalMaterial()
+                boxMat4
             )
             box.position.set(x, y, 0);
             scene.add(box)
