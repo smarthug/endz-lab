@@ -23,6 +23,7 @@
     "three-to-cannon": "^4.0.2",
     "use-github-hotkey": "^1.0.4",
     "web-vitals": "^1.1.2",
+    "worker-loader": "^3.0.8",
     "workerize-loader": "^1.3.0"
   },
   "scripts": {

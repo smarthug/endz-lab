@@ -1,0 +1,90 @@
+import p2 from 'p2-es'
+
+let world = null
+
+// let array = null;
+
+const objectsToUpdate = []
+
+//material
+const boxMaterial = new p2.Material()
+const platform1Material = new p2.Material();
+const platform2Material = new p2.Material();
+
+onmessage = ({data}) => {
+    // console.log(data)
+    switch (data.operation) {
+        case 'initWorld':
+            init()
+            break;
+        case 'step':
+            step(...data.props);
+            break;
+        case 'createBox':
+            createBox(...data.props);
+            break;
+        default:
+            break;
+    }
+}
+
+function init() {
+    world = new p2.World({
+        gravity: [0, -9.82]
+    });
+
+
+
+    // Create an infinite ground plane body
+    var groundBody = new p2.Body({
+        mass: 0 // Setting mass to 0 makes it static
+    });
+    var groundShape = new p2.Plane();
+    groundBody.addShape(groundShape);
+    world.addBody(groundBody);
+
+
+    var contactMaterial1 = new p2.ContactMaterial(boxMaterial, platform1Material, {
+        surfaceVelocity: -0.5,
+    });
+    world.addContactMaterial(contactMaterial1);
+
+    var contactMaterial2 = new p2.ContactMaterial(boxMaterial, platform2Material, {
+        surfaceVelocity: 0.5,
+    });
+    world.addContactMaterial(contactMaterial2);
+}
+
+const step = (deltaTime,array) => {
+    // console.log('works')
+    world.step(1 / 60, deltaTime, 10)
+
+    for (let i = 0; i !== objectsToUpdate.length; i++) {
+
+        let b = objectsToUpdate[i];
+        array[3 * i + 0] = b.position[0];
+        array[3 * i + 1] = b.position[1];
+        array[3 * i + 2] = b.angle;
+    }
+
+    postMessage(array, [array.buffer])
+    array = null;
+    // postMessage("test")
+}
+
+function createBox({ width, height, depth }, { x, y }) {
+    // Create moving box
+    let boxBody = new p2.Body({
+        mass: 1,
+        position: [x, y]
+    }),
+        boxShape = new p2.Box({
+            width: width,
+            height: height,
+            material: boxMaterial
+        });
+    boxBody.addShape(boxShape);
+    world.addBody(boxBody);
+    objectsToUpdate.push(boxBody)
+
+}
