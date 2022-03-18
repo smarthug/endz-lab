@@ -176,15 +176,15 @@ export default function Main() {
 
         // createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 5 })
 
-        // createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: -1, y: 2 }, true)
-        // createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: 1, y: 3 }, false)
-        // createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: -1, y: 4 }, true)
+        createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: -1, y: 2 }, true)
+        createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: 1, y: 3 }, false)
+        createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: -1, y: 4 }, true)
 
-        // createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: 1, y: 5 }, false)
-        // createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: -1, y: 6 }, true)
-        // createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: 1, y: 7 }, false)
-        // createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: -1, y: 8 }, true)
-        // createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: 1, y: 9 }, false)
+        createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: 1, y: 5 }, false)
+        createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: -1, y: 6 }, true)
+        createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: 1, y: 7 }, false)
+        createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: -1, y: 8 }, true)
+        createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: 1, y: 9 }, false)
     }
 
     const boxGeo = new THREE.BoxGeometry(0.5, 0.5, 0.5)
@@ -208,13 +208,13 @@ export default function Main() {
     ]
     function createBox({ width, height, depth }, { x, y }) {
 
-        worker.postMessage({ operation: "createBox", props: [{ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 5 }] })
+        worker.postMessage({ operation: "createBox", props: [{ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: y }] })
 
         let box = new THREE.Mesh(
             boxGeo,
             matcapArray[count % 8]
         )
-        box.position.set(x, y + 1, 0);
+        box.position.set(x, y, 0);
         scene.add(box)
         pushMax(box)
     }
@@ -229,6 +229,16 @@ export default function Main() {
         //     scene.add(box)
         //     // objectsToUpdate.push
         // })
+
+        worker.postMessage({ operation: "createMovingPlatform", props: [{ width, height, depth }, { x, y }, right] })
+
+        let box = new THREE.Mesh(
+            new THREE.BoxGeometry(width, height, depth),
+            boxMat4
+        )
+        box.position.set(x, y, 0);
+        scene.add(box)
+        // pushMax(box)
     }
 
     function tick() {

@@ -28,6 +28,9 @@ onmessage = ({ data }) => {
         case 'createBox':
             createBox(...data.props);
             break;
+        case 'createMovingPlatform':
+            createMovingPlatform(...data.props);
+            break;
         case 'reset':
             reset();
             break;
@@ -90,8 +93,10 @@ function createBox({ width, height, depth }, { x, y }) {
         position: [x, y]
     }),
         boxShape = new p2.Box({
-            width: width + 0.02,
-            height: height + 0.02,
+            // width: width + 0.02,
+            // height: height + 0.02,
+            width: width,
+            height: height,
             material: boxMaterial
         });
 
@@ -103,6 +108,21 @@ function createBox({ width, height, depth }, { x, y }) {
     // 0,99 , 100 개는 째는 다시 0으로
     pushMax(boxBody)
 
+}
+
+function createMovingPlatform({ width, height, depth }, { x, y }, right) {
+    // Create moving box
+    let boxBody = new p2.Body({
+        mass: 0,
+        position: [x, y]
+    }),
+        boxShape = new p2.Box({
+            width: width,
+            height: height,
+            material: right ? platform1Material : platform2Material
+        });
+    boxBody.addShape(boxShape);
+    world.addBody(boxBody);
 }
 
 function pushMax(body) {
