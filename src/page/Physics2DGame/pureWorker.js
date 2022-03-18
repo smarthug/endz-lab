@@ -46,7 +46,8 @@ function init() {
 
     // Create an infinite ground plane body
     var groundBody = new p2.Body({
-        mass: 0 // Setting mass to 0 makes it static
+        mass: 0, // Setting mass to 0 makes it static
+        position: [0, 1]
     });
     var groundShape = new p2.Plane();
     groundBody.addShape(groundShape);
@@ -89,8 +90,8 @@ function createBox({ width, height, depth }, { x, y }) {
         position: [x, y]
     }),
         boxShape = new p2.Box({
-            width: width+0.02,
-            height: height+0.02,
+            width: width + 0.02,
+            height: height + 0.02,
             material: boxMaterial
         });
 
