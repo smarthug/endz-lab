@@ -2,41 +2,28 @@ import React, { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import GUI from "lil-gui";
-import p2 from 'p2-es'
-
-// eslint-disable-next-line import/no-webpack-loader-syntax
-// import worker from 'workerize-loader!./worker'
-
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import Worker from 'worker-loader!./pureWorker'
 
-// let instance = worker()  // `new` is optional
-
-
-
-// worker.addEventListener("message", function (event) { });
-
-// instance.expensive(1000).then( count => {
-//     console.log(`Ran ${count} loops`)
-// })
 
 let renderer, camera, controls;
 // let array = new Float32Array(6);
-let N = 300
+let N = 5
 let array = new Float32Array(N * 3);
+let flyingArray = [];
 
 const worker = new Worker();
+worker.postMessage = worker.webkitPostMessage || worker.postMessage;
+
 
 worker.postMessage('hi');
 worker.onmessage = function ({ data }) {
     // console.log(data)
-    array = data
+    array = data[0]
+    flyingArray = data[1]
+    // console.log(flyingArray)
     // 이 안에서 루프 해보기 ... 
-    for (let i = 0; i < objectsToUpdate.length; i++) {
-        objectsToUpdate[i].position.x = array[3 * i + 0]
-        objectsToUpdate[i].position.y = array[3 * i + 1]
-        objectsToUpdate[i].rotation.z = array[3 * i + 2]
-    }
+
 };
 
 let count = 0;
@@ -54,6 +41,7 @@ const clock = new THREE.Clock()
 let oldElapsedTime = 0;
 
 const objectsToUpdate = [];
+const platforms = [];
 
 /**
  * Textures
@@ -67,33 +55,14 @@ const matcap5 = textureLoader.load('/textures/matcaps/5.png')
 const matcap6 = textureLoader.load('/textures/matcaps/6.png')
 const matcap7 = textureLoader.load('/textures/matcaps/7.png')
 const matcap8 = textureLoader.load('/textures/matcaps/8.png')
-console.log(matcap1)
-
 
 /**
- * Sizes
+ * Sizes 
  */
 const sizes = {
     width: window.innerWidth,
     height: window.innerHeight
 }
-
-
-
-
-const ground = new THREE.Mesh(
-    new THREE.PlaneGeometry(10, 10),
-    new THREE.MeshMatcapMaterial({
-        side: THREE.DoubleSide,
-        matcap: matcap1
-    })
-)
-ground.rotation.x = -Math.PI * 0.5
-scene.add(ground)
-
-//material
-// const boxMaterial = new p2.Material()
-
 
 debugObject.createBox = () => {
     // createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 5 })
@@ -105,35 +74,14 @@ debugObject.test = () => {
 }
 gui.add(debugObject, 'test')
 
-// debugObject.reset = () => {
-//     for (const object of objectsToUpdate) {
-//         // Remove
-//         instance.removeBody(object.body)
-
-//         // Remove mesh
-//         scene.remove(object.mesh)
-
-
-//     }
-//     objectsToUpdate.splice(0, objectsToUpdate.length)
-// }
-// gui.add(debugObject, 'reset')
-
 debugObject.reset = () => {
-    // instance.reset();
-    // worker.reset();
+
+    worker.postMessage({ operation: "reset" })
     for (const object of objectsToUpdate) {
-        // Remove
-
-
-
-        // Remove mesh
         scene.remove(object)
-
-
     }
     objectsToUpdate.splice(0, objectsToUpdate.length)
-    count=0
+    count = 0
 }
 gui.add(debugObject, 'reset')
 
@@ -146,6 +94,9 @@ export default function Main() {
         sceneInit();
         tick();
 
+        return () => {
+            worker.terminate();
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -184,6 +135,7 @@ export default function Main() {
 
         // Controls
         controls = new OrbitControls(camera, canvas);
+        controls.target = new THREE.Vector3(0, 1, 0)
         controls.enableDamping = true;
 
         // Renderer
@@ -211,42 +163,49 @@ export default function Main() {
     }
 
     function sceneInit() {
-
-        // instance.initWorld(array);
-        // instance.initWorld();
-
         worker.postMessage({ operation: "initWorld" })
-        //
-        // worker.postMessage({ operation: "step", props: [0], array: array })
-        // objectsToUpdate.push({
-        //     mesh: box,
-        //     body: boxBody
-        // })
 
-        // objectsToUpdate.push(ground)
+        const ground = new THREE.Mesh(
+            new THREE.PlaneGeometry(100, 100),
+            new THREE.MeshMatcapMaterial({
+                side: THREE.DoubleSide,
+                matcap: matcap1
+            })
+        )
+        ground.position.set(0, 1, 0)
+        ground.rotation.x = -Math.PI * 0.5
+        scene.add(ground)
 
-        // setInterval(() => {
-        //     createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 10 })
-
-        // }, 1500)
         setInterval(() => {
-            createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 4 })
+            createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 3, y: 20 })
 
         }, 1500)
+
         // createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 5 })
 
-        // createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: -1, y: 2 }, true)
-        // createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: 1, y: 3 }, false)
-        // createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: -1, y: 4 }, true)
+        createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: -1, y: 2 }, true)
+        createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: 1, y: 3 }, false)
+        createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: -1, y: 4 }, true)
 
-        // createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: 1, y: 5 }, false)
-        // createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: -1, y: 6 }, true)
-        // createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: 1, y: 7 }, false)
-        // createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: -1, y: 8 }, true)
-        // createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: 1, y: 9 }, false)
+        createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: 1, y: 5 }, false)
+        createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: -1, y: 6 }, true)
+        createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: 1, y: 7 }, false)
+        createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: -1, y: 8 }, true)
+        createMovingPlatform({ width: 9, height: 0.2, depth: 1 }, { x: 4, y: 9 }, false)
+
+
+
+        createFlying({ width: 1, height: 0.3, depth: 1 }, { x: 1, y: 11 }, 1)
+        createFlying({ width: 1, height: 0.3, depth: 1 }, { x: 0, y: 12 }, 2)
+        createFlying({ width: 1, height: 0.3, depth: 1 }, { x: 1, y: 13 }, 3)
+        createFlying({ width: 1, height: 0.3, depth: 1 }, { x: -1, y: 14 }, 4)
+
+        createFlying({ width: 1, height: 0.3, depth: 1 }, { x: -1, y: 15 }, 1)
+        createFlying({ width: 1, height: 0.3, depth: 1 }, { x: 1, y: 16 }, 2)
+        createFlying({ width: 1, height: 0.3, depth: 1 }, { x: -1, y: 17 }, 3)
+        createFlying({ width: 1, height: 0.3, depth: 1 }, { x: 1, y: 18 }, 2)
     }
 
-    // const boxGeo = new THREE.BoxGeometry(width, height, depth)
     const boxGeo = new THREE.BoxGeometry(0.5, 0.5, 0.5)
     const boxMat1 = new THREE.MeshMatcapMaterial({ matcap: matcap1 })
     const boxMat2 = new THREE.MeshMatcapMaterial({ matcap: matcap2 })
@@ -267,58 +226,78 @@ export default function Main() {
         boxMat8,
     ]
     function createBox({ width, height, depth }, { x, y }) {
-        // instance.createBox({ width, height, depth }, { x, y }).then(() => {
 
-        //     let box = new THREE.Mesh(
-        //         boxGeo,
-        //         matcapArray[objectsToUpdate.length%8]
-        //     )
-        //     box.position.set(x, y, 0);
-        //     scene.add(box)
-        //     objectsToUpdate.push(box)
-        // });
-
-        worker.postMessage({ operation: "createBox", props: [{ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 5 }] })
+        worker.postMessage({ operation: "createBox", props: [{ width: 0.5, height: 0.5, depth: 0.5 }, { x: x, y: y }] })
 
         let box = new THREE.Mesh(
             boxGeo,
             matcapArray[count % 8]
         )
-        box.position.set(x, y+1, 0);
+        box.position.set(x, y, 0);
         scene.add(box)
-        // objectsToUpdate.push(box)
         pushMax(box)
     }
     //{ width: 3, height: 0.2, depth: 1 }, { x: 1, y: 7 }
-    // function createMovingPlatform({ width, height, depth }, { x, y }, right) {
-    //     // instance.createMovingPlatform({ width, height, depth }, { x, y }, right).then(() => {
-    //     //     let box = new THREE.Mesh(
-    //     //         new THREE.BoxGeometry(width, height, depth),
-    //     //         boxMat4
-    //     //     )
-    //     //     box.position.set(x, y, 0);
-    //     //     scene.add(box)
-    //     //     // objectsToUpdate.push
-    //     // })
-    // }
+    function createMovingPlatform({ width, height, depth }, { x, y }, right) {
+        worker.postMessage({ operation: "createMovingPlatform", props: [{ width, height, depth }, { x, y }, right] })
+
+        let box = new THREE.Mesh(
+            new THREE.BoxGeometry(width, height, depth),
+            boxMat4
+        )
+        box.position.set(x, y, 0);
+        scene.add(box)
+        // pushMax(box)
+    }
+
+    function createFlying({ width, height, depth }, { x, y }, speed) {
+        // Add platforms
+        // var platformPositions = [[2,0],[0,1],[-2,2]];
+        //   var platformBody = new p2.Body({
+        //     mass: 0, // Static
+        //     position:platformPositions[i],
+        //     type: p2.Body.KINEMATIC
+        //   });
+        //   var platformShape = new p2.Box({
+        //     width: 1,
+        //     height: 0.3,
+        //     material: groundMaterial
+        //   });
+        //   platformBody.addShape(platformShape);
+        //   world.addBody(platformBody);
+        worker.postMessage({ operation: "createFlying", props: [{ width, height, depth }, { x, y }, speed] })
+        let mesh = new THREE.Mesh(
+            new THREE.BoxGeometry(width, height, depth),
+            boxMat4
+        )
+        mesh.position.set(x, y, 0);
+        scene.add(mesh)
+        platforms.push(mesh);
+
+    }
 
     function tick() {
         const elapsedTime = clock.getElapsedTime();
         const deltaTime = elapsedTime - oldElapsedTime
         oldElapsedTime = elapsedTime
 
-        // Update physics world
-        // console.log(array)
-
-        // worker.postMessage({ operation: "step", props: [deltaTime, array] }, [array.buffer])
         if (array) {
 
-            worker.postMessage({ operation: "step", props: [deltaTime], array: array }, [array.buffer])
-            array = null
+            for (let i = 0; i < objectsToUpdate.length; i++) {
+                objectsToUpdate[i].position.x = array[3 * i + 0]
+                objectsToUpdate[i].position.y = array[3 * i + 1]
+                objectsToUpdate[i].rotation.z = array[3 * i + 2]
+            }
+
+            for (let i = 0; i < platforms.length; i++) {
+                platforms[i].position.x = flyingArray[3 * i + 0]
+                platforms[i].position.y = flyingArray[3 * i + 1]
+                platforms[i].rotation.z = flyingArray[3 * i + 2]
+            }
+
+            sendBuffer(deltaTime)
         }
 
-
-        // array = null
         // Update controls
         controls.update();
 
@@ -330,4 +309,11 @@ export default function Main() {
     }
 
     return <canvas ref={canvasRef} className="webgl"></canvas>;
+}
+
+
+
+function sendBuffer(deltaTime) {
+    worker.postMessage({ operation: "step", props: [deltaTime], array: array }, [array.buffer])
+    array = null
 }

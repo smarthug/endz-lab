@@ -3,17 +3,24 @@ import p2 from 'p2-es'
 let world = null
 
 let array = null;
+let flyingArray = [];
 
 let count = 0;
 
-let N = 300
+let N = 5
 
 const objectsToUpdate = []
+const platforms = []
 
 //material
 const boxMaterial = new p2.Material()
 const platform1Material = new p2.Material();
 const platform2Material = new p2.Material();
+const groundMaterial = new p2.Material();
+
+
+
+let elapsedtime = 0
 
 onmessage = ({ data }) => {
     // console.log(data)
@@ -30,6 +37,9 @@ onmessage = ({ data }) => {
             break;
         case 'createMovingPlatform':
             createMovingPlatform(...data.props);
+            break;
+        case 'createFlying':
+            createFlying(...data.props);
             break;
         case 'reset':
             reset();
@@ -71,6 +81,7 @@ function init() {
 const step = (deltaTime) => {
     // console.log('works')
     world.step(1 / 60, deltaTime, 10)
+    elapsedtime += deltaTime
 
     for (let i = 0; i !== objectsToUpdate.length; i++) {
 
@@ -81,7 +92,18 @@ const step = (deltaTime) => {
         array[3 * i + 2] = b.angle;
     }
 
-    postMessage(array, [array.buffer])
+    for (let i = 0; i < platforms.length; i++) {
+        // platform 마다 이동속도에 대한거 있어야할듯 ...
+        // console.log(platforms)
+        platforms[i].velocity[0] = platforms[i].customSpeed * Math.sin(elapsedtime);
+        let b = platforms[i];
+        flyingArray[3 * i + 0] = b.position[0];
+        flyingArray[3 * i + 1] = b.position[1];
+        flyingArray[3 * i + 2] = b.angle;
+    }
+
+
+    postMessage([array,flyingArray], [array.buffer])
     array = null;
     // postMessage("test")
 }
@@ -125,6 +147,23 @@ function createMovingPlatform({ width, height, depth }, { x, y }, right) {
     world.addBody(boxBody);
 }
 
+function createFlying({ width, height, depth }, { x, y },speed) {
+    let platformBody = new p2.Body({
+        mass: 0, // Static
+        position: [x, y],
+        type: p2.Body.KINEMATIC
+    });
+    platformBody.customSpeed = speed
+    let platformShape = new p2.Box({
+        width: width,
+        height: height,
+        material: groundMaterial
+    });
+    platformBody.addShape(platformShape);
+    world.addBody(platformBody);
+    platforms.push(platformBody);
+}
+
 function pushMax(body) {
     let oldBody = objectsToUpdate[count % N];
     if (oldBody) {
@@ -144,3 +183,13 @@ function reset() {
 
     count = 0;
 }
+
+
+// world.on('postStep', function () {
+//     for (let i = 0; i < platforms.length; i++) {
+//         platforms[i].velocity[0] = 2 * Math.sin(world.time);
+//     }
+
+//     // Apply button response
+//     // characterBody.velocity[0] = walkSpeed * (buttons.right - buttons.left);
+// });
