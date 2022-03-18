@@ -8,7 +8,7 @@ import Worker from 'worker-loader!./pureWorker'
 
 let renderer, camera, controls;
 // let array = new Float32Array(6);
-let N = 5
+let N = 100
 let array = new Float32Array(N * 3);
 let flyingArray = [];
 

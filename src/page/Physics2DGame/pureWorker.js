@@ -7,7 +7,7 @@ let flyingArray = [];
 
 let count = 0;
 
-let N = 5
+let N = 100
 
 const objectsToUpdate = []
 const platforms = []

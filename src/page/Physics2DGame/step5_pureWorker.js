@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import GUI from "lil-gui";
-import p2 from 'p2-es'
+// import p2 from 'p2-es'
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 // import worker from 'workerize-loader!./worker'
