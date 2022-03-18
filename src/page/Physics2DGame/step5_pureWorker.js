@@ -22,7 +22,8 @@ import Worker from 'worker-loader!./pureWorker'
 
 let renderer, camera, controls;
 // let array = new Float32Array(6);
-let array = new Float32Array(300);
+let N = 300
+let array = new Float32Array(N *3);
 
 const worker = new Worker();
 
@@ -31,6 +32,8 @@ worker.onmessage = function ({ data }) {
     // console.log(data)
     array = data
 };
+
+let count = 0;
 /**
  * Base
  */
@@ -138,6 +141,17 @@ export default function Main() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    function pushMax(mesh) {
+        let oldMesh = objectsToUpdate[count % N];
+        if (oldMesh) {
+    
+            scene.remove(oldMesh);
+        }
+        objectsToUpdate[count % N] = mesh;
+    
+        count++;
+    }
+
     function baseInit() {
         const canvas = canvasRef.current;
 
@@ -195,7 +209,7 @@ export default function Main() {
 
         worker.postMessage({ operation: "initWorld" })
         //
-
+        // worker.postMessage({ operation: "step", props: [0], array: array })
         // objectsToUpdate.push({
         //     mesh: box,
         //     body: boxBody
@@ -205,19 +219,23 @@ export default function Main() {
 
         // setInterval(() => {
         //     createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 10 })
-        //     // console.log(objectsToUpdate)
+            
         // }, 1500)
-        createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 5 })
+        setInterval(() => {
+            createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 10 })
+            
+        }, 1500)
+        // createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 5 })
 
-        createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: -1, y: 2 }, true)
-        createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: 1, y: 3 }, false)
-        createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: -1, y: 4 }, true)
+        // createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: -1, y: 2 }, true)
+        // createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: 1, y: 3 }, false)
+        // createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: -1, y: 4 }, true)
 
-        createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: 1, y: 5 }, false)
-        createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: -1, y: 6 }, true)
-        createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: 1, y: 7 }, false)
-        createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: -1, y: 8 }, true)
-        createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: 1, y: 9 }, false)
+        // createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: 1, y: 5 }, false)
+        // createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: -1, y: 6 }, true)
+        // createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: 1, y: 7 }, false)
+        // createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: -1, y: 8 }, true)
+        // createMovingPlatform({ width: 3, height: 0.2, depth: 1 }, { x: 1, y: 9 }, false)
     }
 
     // const boxGeo = new THREE.BoxGeometry(width, height, depth)
@@ -256,11 +274,12 @@ export default function Main() {
 
         let box = new THREE.Mesh(
             boxGeo,
-            matcapArray[objectsToUpdate.length % 8]
+            matcapArray[count % 8]
         )
         box.position.set(x, y, 0);
         scene.add(box)
-        objectsToUpdate.push(box)
+        // objectsToUpdate.push(box)
+        pushMax(box)
     }
     //{ width: 3, height: 0.2, depth: 1 }, { x: 1, y: 7 }
     function createMovingPlatform({ width, height, depth }, { x, y }, right) {
@@ -281,17 +300,19 @@ export default function Main() {
         oldElapsedTime = elapsedTime
 
         // Update physics world
-          // console.log(array)
+        // console.log(array)
 
-        // worker.postMessage({operation:"step", props:[deltaTime, array]}, [array.buffer])
+        // worker.postMessage({ operation: "step", props: [deltaTime, array] }, [array.buffer])
 
-        worker.postMessage({ operation: "step", props: [deltaTime, array] })
+        worker.postMessage({ operation: "step", props: [deltaTime], array: array })
+
 
         for (let i = 0; i < objectsToUpdate.length; i++) {
             objectsToUpdate[i].position.x = array[3 * i + 0]
             objectsToUpdate[i].position.y = array[3 * i + 1]
             objectsToUpdate[i].rotation.z = array[3 * i + 2]
         }
+
 
         // array = null
         // Update controls
