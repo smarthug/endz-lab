@@ -28,6 +28,9 @@ onmessage = ({ data }) => {
         case 'createBox':
             createBox(...data.props);
             break;
+        case 'reset':
+            reset();
+            break;
         default:
             break;
     }
@@ -38,7 +41,8 @@ function init() {
         gravity: [0, -9.82]
     });
 
-
+    // Allow sleeping
+    world.sleepMode = p2.World.BODY_SLEEPING;
 
     // Create an infinite ground plane body
     var groundBody = new p2.Body({
@@ -85,10 +89,14 @@ function createBox({ width, height, depth }, { x, y }) {
         position: [x, y]
     }),
         boxShape = new p2.Box({
-            width: width,
-            height: height,
+            width: width+0.02,
+            height: height+0.02,
             material: boxMaterial
         });
+
+    boxBody.allowSleep = true;
+    boxBody.sleepSpeedLimit = 0.5; // Body will feel sleepy if speed<1 (speed is the norm of velocity)
+    boxBody.sleepTimeLimit = 5; // Body falls asleep after 1s of sleepiness
     boxBody.addShape(boxShape);
     world.addBody(boxBody);
     // 0,99 , 100 개는 째는 다시 0으로
@@ -105,4 +113,13 @@ function pushMax(body) {
     objectsToUpdate[count % N] = body;
 
     count++
+}
+
+function reset() {
+    for (const body of objectsToUpdate) {
+        world.removeBody(body);
+    }
+    objectsToUpdate.splice(0, objectsToUpdate.length)
+
+    count = 0;
 }

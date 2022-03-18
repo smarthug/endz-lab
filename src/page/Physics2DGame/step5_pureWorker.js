@@ -23,7 +23,7 @@ import Worker from 'worker-loader!./pureWorker'
 let renderer, camera, controls;
 // let array = new Float32Array(6);
 let N = 300
-let array = new Float32Array(N *3);
+let array = new Float32Array(N * 3);
 
 const worker = new Worker();
 
@@ -31,6 +31,12 @@ worker.postMessage('hi');
 worker.onmessage = function ({ data }) {
     // console.log(data)
     array = data
+    // 이 안에서 루프 해보기 ... 
+    for (let i = 0; i < objectsToUpdate.length; i++) {
+        objectsToUpdate[i].position.x = array[3 * i + 0]
+        objectsToUpdate[i].position.y = array[3 * i + 1]
+        objectsToUpdate[i].rotation.z = array[3 * i + 2]
+    }
 };
 
 let count = 0;
@@ -115,6 +121,7 @@ gui.add(debugObject, 'test')
 
 debugObject.reset = () => {
     // instance.reset();
+    // worker.reset();
     for (const object of objectsToUpdate) {
         // Remove
 
@@ -126,6 +133,7 @@ debugObject.reset = () => {
 
     }
     objectsToUpdate.splice(0, objectsToUpdate.length)
+    count=0
 }
 gui.add(debugObject, 'reset')
 
@@ -144,11 +152,11 @@ export default function Main() {
     function pushMax(mesh) {
         let oldMesh = objectsToUpdate[count % N];
         if (oldMesh) {
-    
+
             scene.remove(oldMesh);
         }
         objectsToUpdate[count % N] = mesh;
-    
+
         count++;
     }
 
@@ -219,11 +227,11 @@ export default function Main() {
 
         // setInterval(() => {
         //     createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 10 })
-            
+
         // }, 1500)
         setInterval(() => {
-            createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 10 })
-            
+            createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 4 })
+
         }, 1500)
         // createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 5 })
 
@@ -276,7 +284,7 @@ export default function Main() {
             boxGeo,
             matcapArray[count % 8]
         )
-        box.position.set(x, y, 0);
+        box.position.set(x, y+1, 0);
         scene.add(box)
         // objectsToUpdate.push(box)
         pushMax(box)
@@ -303,14 +311,10 @@ export default function Main() {
         // console.log(array)
 
         // worker.postMessage({ operation: "step", props: [deltaTime, array] }, [array.buffer])
+        if (array) {
 
-        worker.postMessage({ operation: "step", props: [deltaTime], array: array })
-
-
-        for (let i = 0; i < objectsToUpdate.length; i++) {
-            objectsToUpdate[i].position.x = array[3 * i + 0]
-            objectsToUpdate[i].position.y = array[3 * i + 1]
-            objectsToUpdate[i].rotation.z = array[3 * i + 2]
+            worker.postMessage({ operation: "step", props: [deltaTime], array: array }, [array.buffer])
+            array = null
         }
 
 
