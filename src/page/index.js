@@ -10,4 +10,4 @@ export * as KameHouse from './kameHouse'
 export * as MyUniverse from './myUniverse'
 
 export * as Pysics2DGame from './Physics2DGame/step7_flying'
-export * as NoPhysicsGame from './NoPhysicsGame/step2'
+export * as NoPhysicsGame from './NoPhysicsGame/step3'
