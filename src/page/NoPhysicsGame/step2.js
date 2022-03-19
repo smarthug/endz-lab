@@ -18,7 +18,12 @@ const gltfLoader = new GLTFLoader();
 let horizonAxis = 0;
 let verticalAxis = 0;
 
-const zeroVector = new THREE.Vector3(1,0,0)
+
+let mixer = { update: () => { } };
+
+let idleAction = { play: () => { }, stop: () => { } };
+let walkAction = { play: () => { }, stop: () => { } };
+let runAction = { play: () => { }, stop: () => { } };
 
 const params = {
 
@@ -221,8 +226,8 @@ export default function Main() {
             new RoundedBoxGeometry(1.0, 2.0, 1.0, 10, 0.5),
             new THREE.MeshStandardMaterial({
                 wireframe: true,
-                transparent:true,
-                opacity:0
+                transparent: true,
+                opacity: 0
             })
         );
         player.geometry.translate(0, - 0.5, 0);
@@ -246,6 +251,15 @@ export default function Main() {
             updateAllMaterials(scene)
 
             player.add(scene)
+
+
+
+            const animations = gltf.animations;
+            mixer = new THREE.AnimationMixer(player);
+            idleAction = mixer.clipAction(animations[0]);
+            walkAction = mixer.clipAction(animations[3]);
+            runAction = mixer.clipAction(animations[1]);
+            idleAction.play();
             // scene.add(scene2)
             // const clips = gltf.animations || [];
             // if (!scene2) {
@@ -491,7 +505,7 @@ export default function Main() {
             tempVector.set(0, 0, - 1).applyAxisAngle(upVector, angle);
             player.position.addScaledVector(tempVector, params.playerSpeed * delta);
 
-            player.rotation.y = Math.atan2(tempVector.x,tempVector.z)
+            player.rotation.y = Math.atan2(tempVector.x, tempVector.z)
 
         }
 
@@ -500,7 +514,7 @@ export default function Main() {
             tempVector.set(0, 0, 1).applyAxisAngle(upVector, angle);
             player.position.addScaledVector(tempVector, params.playerSpeed * delta);
 
-            player.rotation.y = Math.atan2(tempVector.x,tempVector.z)
+            player.rotation.y = Math.atan2(tempVector.x, tempVector.z)
 
         }
 
@@ -509,7 +523,7 @@ export default function Main() {
             tempVector.set(- 1, 0, 0).applyAxisAngle(upVector, angle);
             player.position.addScaledVector(tempVector, params.playerSpeed * delta);
 
-            player.rotation.y = Math.atan2(tempVector.x,tempVector.z)
+            player.rotation.y = Math.atan2(tempVector.x, tempVector.z)
 
         }
 
@@ -519,15 +533,16 @@ export default function Main() {
             player.position.addScaledVector(tempVector, params.playerSpeed * delta);
 
 
-            player.rotation.y = Math.atan2(tempVector.x,tempVector.z)
+            player.rotation.y = Math.atan2(tempVector.x, tempVector.z)
         }
 
         if (horizonAxis !== 0 && verticalAxis !== 0) {
 
-            tempVector.set(horizonAxis, 0, verticalAxis).applyAxisAngle(upVector, angle).normalize();
+            // tempVector.set(horizonAxis, 0, verticalAxis).applyAxisAngle(upVector, angle).normalize();
+            tempVector.set(horizonAxis, 0, verticalAxis).applyAxisAngle(upVector, angle);
             player.position.addScaledVector(tempVector, params.playerSpeed * delta);
 
-            player.rotation.y = Math.atan2(tempVector.x,tempVector.z)
+            player.rotation.y = Math.atan2(tempVector.x, tempVector.z)
         }
         // angle 을 바로 넣자 , rotation 에 z 에 ...
         // player.rotation.y = zeroVector.angleTo(tempVector)
@@ -679,6 +694,8 @@ export default function Main() {
 
         }
 
+        mixer.update(delta);
+
         // TODO: limit the camera movement based on the collider
         // raycast in direction of camera and move it if it's further than the closest point
 
@@ -719,7 +736,7 @@ function reset() {
 /**
  * Update all materials
  */
- const updateAllMaterials = (scene) => {
+const updateAllMaterials = (scene) => {
     scene.traverse((child) => {
         if (child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial) {
             // child.material.envMapIntensity = 1
