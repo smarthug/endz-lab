@@ -1,3 +1,5 @@
+/* eslint-disable no-loop-func */
+/* eslint-disable no-mixed-operators */
 import React, { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
@@ -30,11 +32,11 @@ const proxy = new Proxy({ speed: 0 },
     {
         set(obj, prop, newval) {
 
-            if (newval > 0.2  && newval < 0.5) {
+            if (newval > 0.2 && newval < 0.5) {
                 idleAction.stop()
                 runAction.stop()
                 walkAction.play()
-            }else if (newval > 0.5) {
+            } else if (newval > 0.5) {
                 idleAction.stop();
                 walkAction.stop();
                 runAction.play()
@@ -91,7 +93,7 @@ let oldElapsedTime = 0;
 /**
  * Textures
  */
-const textureLoader = new THREE.TextureLoader()
+// const textureLoader = new THREE.TextureLoader()
 
 /**
  * Test cube
@@ -105,10 +107,10 @@ scene.add(cube)
 /**
  * Sizes
  */
-const sizes = {
-    width: window.innerWidth,
-    height: window.innerHeight
-}
+// const sizes = {
+//     width: window.innerWidth,
+//     height: window.innerHeight
+// }
 
 export default function Main() {
     const canvasRef = useRef();
@@ -149,48 +151,6 @@ export default function Main() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    function baseInit() {
-        const canvas = canvasRef.current;
-
-        /**
-         * Camera
-         */
-        // Base camera
-        camera = new THREE.PerspectiveCamera(
-            75,
-            sizes.width / sizes.height,
-            0.1,
-            100
-        );
-        camera.position.z = 3
-        scene.add(camera);
-
-        // Controls
-        controls = new OrbitControls(camera, canvas);
-        controls.enableDamping = true;
-
-        // Renderer
-
-        renderer = new THREE.WebGLRenderer({
-            canvas: canvas,
-        });
-        renderer.setSize(sizes.width, sizes.height);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-        window.addEventListener("resize", () => {
-            // console.log("window has been resized")
-            sizes.width = window.innerWidth;
-            sizes.height = window.innerHeight;
-
-            //Update camera
-            camera.aspect = sizes.width / sizes.height;
-            camera.updateProjectionMatrix();
-
-            //Update Renderer
-            renderer.setSize(sizes.width, sizes.height);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        });
-    }
 
     function init() {
 
@@ -237,7 +197,7 @@ export default function Main() {
         // clock = new THREE.Clock();
 
         controls = new OrbitControls(camera, renderer.domElement);
-
+        controls.enableDamping = true;
         // stats setup
         stats = new Stats();
         document.body.appendChild(stats.dom);
@@ -372,7 +332,8 @@ export default function Main() {
                     }
 
                     break;
-
+                default:
+                    console.log('what')
             }
 
         });
@@ -385,6 +346,8 @@ export default function Main() {
                 case 'KeyS': bkdPressed = false; break;
                 case 'KeyD': rgtPressed = false; break;
                 case 'KeyA': lftPressed = false; break;
+                default:
+                    console.log('what')
 
             }
 
@@ -571,7 +534,7 @@ export default function Main() {
         }
         // angle 을 바로 넣자 , rotation 에 z 에 ...
         // player.rotation.y = zeroVector.angleTo(tempVector)
-        
+
 
         player.updateMatrixWorld();
 
