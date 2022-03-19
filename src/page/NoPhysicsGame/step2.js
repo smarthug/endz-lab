@@ -13,8 +13,12 @@ import { MeshBVH, MeshBVHVisualizer } from 'three-mesh-bvh';
 
 import nipplejs from 'nipplejs'
 
+const gltfLoader = new GLTFLoader();
+
 let horizonAxis = 0;
 let verticalAxis = 0;
+
+const zeroVector = new THREE.Vector3(1,0,0)
 
 const params = {
 
@@ -51,6 +55,8 @@ let tempSegment = new THREE.Line3();
 
 // Scene
 const scene = new THREE.Scene()
+
+scene.add(new THREE.AxesHelper(5))
 
 const clock = new THREE.Clock()
 let oldElapsedTime = 0;
@@ -92,8 +98,8 @@ export default function Main() {
             // position: { left: '5%', top: '90%' },
             // color: 'red'
         });
-        
-        manager.on("move", function (evt, {vector}) {
+
+        manager.on("move", function (evt, { vector }) {
             const { x, y } = vector;
             console.log(vector)
             // set({ controls: { horizonAxis: -x, verticalAxis: y } })
@@ -102,9 +108,9 @@ export default function Main() {
             // runAction.play();
             // idleAction.stop();
         });
-        
+
         manager.on("end", function (evt, data) {
-        
+
             // set({ controls: { horizonAxis: 0, verticalAxis: 0 } })
             horizonAxis = 0;
             verticalAxis = 0;
@@ -213,16 +219,53 @@ export default function Main() {
         // character
         player = new THREE.Mesh(
             new RoundedBoxGeometry(1.0, 2.0, 1.0, 10, 0.5),
-            new THREE.MeshStandardMaterial()
+            new THREE.MeshStandardMaterial({
+                wireframe: true,
+                transparent:true,
+                opacity:0
+            })
         );
         player.geometry.translate(0, - 0.5, 0);
         player.capsuleInfo = {
             radius: 0.5,
             segment: new THREE.Line3(new THREE.Vector3(), new THREE.Vector3(0, - 1.0, 0.0))
         };
-        player.castShadow = true;
-        player.receiveShadow = true;
-        player.material.shadowSide = 2;
+        // player.castShadow = true;
+        // player.receiveShadow = true;
+        // player.material.shadowSide = 2;
+
+        gltfLoader.load("models/Soldier.glb", (gltf) => {
+            const scene = gltf.scene || gltf.scenes[0];
+            scene.rotation.y = Math.PI;
+            scene.position.y = -1.5
+
+
+            scene.castShadow = true;
+            scene.receiveShadow = true;
+
+            updateAllMaterials(scene)
+
+            player.add(scene)
+            // scene.add(scene2)
+            // const clips = gltf.animations || [];
+            // if (!scene2) {
+            //     // Valid, but not supported by this viewer.
+            //     throw new Error(
+            //         "This model contains no scene, and cannot be viewed here. However," +
+            //         " it may contain individual 3D resources."
+            //     );
+            // }
+            // player = scene2;
+            // // scene.add(player);
+            // obj.add(player);
+            // const animations = gltf.animations;
+            // mixer = new THREE.AnimationMixer(player);
+            // idleAction = mixer.clipAction(animations[0]);
+            // walkAction = mixer.clipAction(animations[3]);
+            // runAction = mixer.clipAction(animations[1]);
+            // idleAction.play();
+        })
+
         scene.add(player);
         reset();
 
@@ -314,7 +357,7 @@ export default function Main() {
 
     function loadColliderEnvironment() {
 
-        new GLTFLoader().load('../models/dungeon_low_poly_game_level_challenge/scene.gltf', res => {
+        gltfLoader.load('../models/dungeon_low_poly_game_level_challenge/scene.gltf', res => {
 
             const gltfScene = res.scene;
             gltfScene.scale.setScalar(.01);
@@ -442,38 +485,13 @@ export default function Main() {
 
         // move the player
         const angle = controls.getAzimuthalAngle();
-        // if (fwdPressed) {
-
-        //     tempVector.set(0, 0, - 1).applyAxisAngle(upVector, angle);
-        //     player.position.addScaledVector(tempVector, params.playerSpeed * delta);
-
-        // }
-
-        // if (bkdPressed) {
-
-        //     tempVector.set(0, 0, 1).applyAxisAngle(upVector, angle);
-        //     player.position.addScaledVector(tempVector, params.playerSpeed * delta);
-
-        // }
-
-        // if (lftPressed) {
-
-        //     tempVector.set(- 1, 0, 0).applyAxisAngle(upVector, angle);
-        //     player.position.addScaledVector(tempVector, params.playerSpeed * delta);
-
-        // }
-
-        // if (rgtPressed) {
-
-        //     tempVector.set(1, 0, 0).applyAxisAngle(upVector, angle);
-        //     player.position.addScaledVector(tempVector, params.playerSpeed * delta);
-
-        // }
 
         if (fwdPressed) {
 
             tempVector.set(0, 0, - 1).applyAxisAngle(upVector, angle);
             player.position.addScaledVector(tempVector, params.playerSpeed * delta);
+
+            player.rotation.y = Math.atan2(tempVector.x,tempVector.z)
 
         }
 
@@ -482,12 +500,16 @@ export default function Main() {
             tempVector.set(0, 0, 1).applyAxisAngle(upVector, angle);
             player.position.addScaledVector(tempVector, params.playerSpeed * delta);
 
+            player.rotation.y = Math.atan2(tempVector.x,tempVector.z)
+
         }
 
         if (lftPressed) {
 
             tempVector.set(- 1, 0, 0).applyAxisAngle(upVector, angle);
             player.position.addScaledVector(tempVector, params.playerSpeed * delta);
+
+            player.rotation.y = Math.atan2(tempVector.x,tempVector.z)
 
         }
 
@@ -496,15 +518,19 @@ export default function Main() {
             tempVector.set(1, 0, 0).applyAxisAngle(upVector, angle);
             player.position.addScaledVector(tempVector, params.playerSpeed * delta);
 
+
+            player.rotation.y = Math.atan2(tempVector.x,tempVector.z)
         }
 
-        if (horizonAxis !==0 &&  verticalAxis !==0) {
+        if (horizonAxis !== 0 && verticalAxis !== 0) {
 
             tempVector.set(horizonAxis, 0, verticalAxis).applyAxisAngle(upVector, angle).normalize();
             player.position.addScaledVector(tempVector, params.playerSpeed * delta);
 
+            player.rotation.y = Math.atan2(tempVector.x,tempVector.z)
         }
         // angle 을 바로 넣자 , rotation 에 z 에 ...
+        // player.rotation.y = zeroVector.angleTo(tempVector)
 
         player.updateMatrixWorld();
 
@@ -668,7 +694,7 @@ export default function Main() {
                 position: "absolute",
                 bottom: "50px",
                 //   left: "5px",
-                zIndex:99,
+                zIndex: 99,
                 color: "white",
                 width: "100px",
                 height: "100px",
@@ -688,4 +714,18 @@ function reset() {
     camera.position.add(player.position);
     controls.update();
 
+}
+
+/**
+ * Update all materials
+ */
+ const updateAllMaterials = (scene) => {
+    scene.traverse((child) => {
+        if (child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial) {
+            // child.material.envMapIntensity = 1
+            // child.material.needsUpdate = true
+            child.castShadow = true
+            child.receiveShadow = true
+        }
+    })
 }
