@@ -30,9 +30,7 @@ let count = 0;
 /**
  * Base
  */
-// Debug
-const gui = new GUI()
-const debugObject = {}
+
 
 // Scene
 const scene = new THREE.Scene()
@@ -64,26 +62,7 @@ const sizes = {
     height: window.innerHeight
 }
 
-debugObject.createBox = () => {
-    // createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 5 })
-}
-gui.add(debugObject, 'createBox')
 
-debugObject.test = () => {
-    console.log(objectsToUpdate.length);
-}
-gui.add(debugObject, 'test')
-
-debugObject.reset = () => {
-
-    worker.postMessage({ operation: "reset" })
-    for (const object of objectsToUpdate) {
-        scene.remove(object)
-    }
-    objectsToUpdate.splice(0, objectsToUpdate.length)
-    count = 0
-}
-gui.add(debugObject, 'reset')
 
 
 
@@ -93,6 +72,32 @@ export default function Main() {
         baseInit();
         sceneInit();
         tick();
+
+        // Debug
+const gui = new GUI()
+const debugObject = {}
+
+
+        debugObject.createBox = () => {
+            // createBox({ width: 0.5, height: 0.5, depth: 0.5 }, { x: 1, y: 5 })
+        }
+        gui.add(debugObject, 'createBox')
+        
+        debugObject.test = () => {
+            console.log(objectsToUpdate.length);
+        }
+        gui.add(debugObject, 'test')
+        
+        debugObject.reset = () => {
+        
+            worker.postMessage({ operation: "reset" })
+            for (const object of objectsToUpdate) {
+                scene.remove(object)
+            }
+            objectsToUpdate.splice(0, objectsToUpdate.length)
+            count = 0
+        }
+        gui.add(debugObject, 'reset')
 
         return () => {
             worker.terminate();

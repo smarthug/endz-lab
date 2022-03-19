@@ -9,9 +9,7 @@ let renderer, camera, controls;
 /**
  * Base
  */
-// Debug
-const gui = new GUI({ width: 360 })
-gui.close()
+
 
 // Scene
 const scene = new THREE.Scene()
@@ -202,6 +200,10 @@ export default function Main() {
     function sceneInit() {
 
         generateGalaxy()
+
+        // Debug
+        const gui = new GUI({ width: 360 })
+        gui.close()
 
         gui.add(parameters, 'count').min(100).max(1000000).step(100).onFinishChange(generateGalaxy)
         gui.add(parameters, 'size').min(0.001).max(0.1).step(0.001).onFinishChange(generateGalaxy)

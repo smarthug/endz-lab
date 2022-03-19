@@ -10,8 +10,7 @@ import { Sky } from "three/examples/jsm/objects/Sky.js";
 
 let mesh, renderer, camera, controls;
 
-const gui = new GUI();
-gui.close()
+
 
 //scene
 const scene = new THREE.Scene();
@@ -144,6 +143,9 @@ function SceneInit() {
     grass.receiveShadow = true
     grassMaterial.roughness = 0.7
     scene.add(grass)
+
+    const gui = new GUI();
+    gui.close()
 
     // light setup 
     let ambientLight = new THREE.AmbientLight('#ffffff', 0.5)
