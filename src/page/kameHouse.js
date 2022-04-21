@@ -350,9 +350,9 @@ function Init(canvasRef) {
     });
     renderer.setSize(sizes.width, sizes.height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.physicallyCorrectLights = true
-    renderer.outputEncoding = THREE.sRGBEncoding
-    renderer.toneMapping = THREE.ACESFilmicToneMapping
+    // renderer.physicallyCorrectLights = true
+    // renderer.outputEncoding = THREE.sRGBEncoding
+    // renderer.toneMapping = THREE.ACESFilmicToneMapping
     renderer.toneMappingExposure = 3
     renderer.shadowMap.enabled = true
     renderer.shadowMap.type = THREE.PCFSoftShadowMap
@@ -360,6 +360,7 @@ function Init(canvasRef) {
     //Controls
     controls = new OrbitControls(camera, canvas);
     controls.enableDamping = true;
+    controls.maxPolarAngle = Math.PI*0.5
 
     window.addEventListener("resize", () => {
         // console.log("window has been resized")
