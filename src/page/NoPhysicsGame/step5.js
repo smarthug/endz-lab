@@ -408,9 +408,16 @@ export default function Main() {
     function loadColliderEnvironment() {
 
         gltfLoader.load('../models/dungeon_low_poly_game_level_challenge/scene.gltf', res => {
+            // gltfLoader.load('../models/TheRoom13.glb', res => {
 
+            // 여기서 , 걍 플레인 넣어보자 , 
             const gltfScene = res.scene;
             gltfScene.scale.setScalar(.01);
+// 
+            // const gltfScene = new THREE.Mesh(new THREE.PlaneGeometry(100, 100, 2, 2), new THREE.MeshNormalMaterial())
+            // gltfScene.scale.setScalar(.01);
+
+            // gltfScene.add(new THREE.Mesh(new THREE.PlaneGeometry(100, 100, 2, 2), new THREE.MeshBasicMaterial()))
 
             const box = new THREE.Box3();
             box.setFromObject(gltfScene);
@@ -509,6 +516,11 @@ export default function Main() {
                 }
 
             });
+
+            // 여기다가 커스텀 , plane 추가해보자 ...
+            // 메쉬 따로 , 콜리전 따로임 ...
+            // const testPlaneGeo = new THREE.PlaneGeometry(100,100);
+            // geometries.push(testPlaneGeo)
 
             // create the merged geometry
             const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(geometries, false);
@@ -753,17 +765,17 @@ export default function Main() {
             // jumpAction.play().reset();
             jumpAction.play().reset();
 
-            window.setTimeout(()=>{
+            window.setTimeout(() => {
 
                 playerVelocity.y = params.jump;
-            },500)
+            }, 500)
             // jumpAction.stop();
-            window.setTimeout(()=>{
+            window.setTimeout(() => {
 
-                jumpAction.crossFadeTo(idleAction,0.3)
+                jumpAction.crossFadeTo(idleAction, 0.3)
                 jumpAction.stop();
                 idleAction.play();
-            },2000)
+            }, 2000)
 
         }
     }
@@ -805,6 +817,7 @@ export default function Main() {
 function reset() {
 
     playerVelocity.set(0, 0, 0);
+    // player.position.set(-3, 6, -3);
     player.position.set(15.75, - 3, 30);
     camera.position.sub(controls.target);
     controls.target.copy(player.position);
