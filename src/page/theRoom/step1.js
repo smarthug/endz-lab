@@ -64,6 +64,7 @@ const proxy = new Proxy({ speed: 0 },
                 // walkAction.crossFadeFrom(idleAction,1)
                 // 애니메이션 수업 듣기 전에는 하지말자 .
             } else if (newval > 0.5) {
+                newval = 1;
                 idleAction.stop();
                 walkAction.stop();
                 runAction.play()
@@ -162,6 +163,7 @@ export default function Main() {
             const { x, y } = vector;
             // console.log(vector)
             // set({ controls: { horizonAxis: -x, verticalAxis: y } })
+            // 여기서도 0.5 이상이면 1을 넣는 ??
             horizonAxis = x;
             verticalAxis = -y;
             // runAction.play();
@@ -556,24 +558,32 @@ export default function Main() {
             scene.add(gltfScene)
         })
 
-        const planeGeo = new THREE.PlaneGeometry(100, 100, 2, 2)
-        planeGeo.rotateX(-Math.PI / 2)
-        const plane = new THREE.Mesh(planeGeo, new THREE.MeshNormalMaterial())
-        // plane.rotation.x = -Math.PI / 2
-        plane.visible = false;
-        scene.add(plane)
+        // ground plane test
+        // const planeGeo = new THREE.PlaneGeometry(100, 100, 2, 2)
+        // planeGeo.rotateX(-Math.PI / 2)
+        // const plane = new THREE.Mesh(planeGeo, new THREE.MeshNormalMaterial())
+        // // plane.rotation.x = -Math.PI / 2
+        // plane.visible = false;
+        // scene.add(plane)
 
-        // create the merged geometry
-        // const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(geometries, false);
-        planeGeo.boundsTree = new MeshBVH(planeGeo, { lazyGeneration: false });
-        collider = new THREE.Mesh(planeGeo);
-        collider.material.wireframe = true;
-        collider.material.opacity = 0.5;
-        collider.material.transparent = true;
-        visualizer = new MeshBVHVisualizer(collider, params.visualizeDepth);
-        scene.add(visualizer);
-        scene.add(collider);
-        // scene.add(environment);
+
+        gltfLoader.load('../models/TheRoom_bsp1.glb', (res) => {
+            const gltfScene = res.scene;
+            console.log(gltfScene)
+            const geo = gltfScene.children[0].geometry;
+            // scene.add(gltfScene)
+            // create the merged geometry
+            // const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(geometries, false);
+            geo.boundsTree = new MeshBVH(geo, { lazyGeneration: false });
+            collider = new THREE.Mesh(geo);
+            collider.material.wireframe = true;
+            collider.material.opacity = 0.5;
+            collider.material.transparent = true;
+            visualizer = new MeshBVHVisualizer(collider, params.visualizeDepth);
+            scene.add(visualizer);
+            scene.add(collider);
+            // scene.add(environment);
+        })
 
     }
 
@@ -625,11 +635,15 @@ export default function Main() {
 
             // tempVector.set(horizonAxis, 0, verticalAxis).applyAxisAngle(upVector, angle).normalize();
             tempVector.set(horizonAxis, 0, verticalAxis).applyAxisAngle(upVector, angle);
+
+            const length = tempVector.length()
+            if (length > 0.5) {
+                tempVector.set(horizonAxis, 0, verticalAxis).applyAxisAngle(upVector, angle).normalize();
+            }
             player.position.addScaledVector(tempVector, params.playerSpeed * delta);
 
             player.rotation.y = Math.atan2(tempVector.x, tempVector.z)
-
-            proxy.speed = tempVector.length();
+            proxy.speed = length;
         }
         // angle 을 바로 넣자 , rotation 에 z 에 ...
         // player.rotation.y = zeroVector.angleTo(tempVector)
