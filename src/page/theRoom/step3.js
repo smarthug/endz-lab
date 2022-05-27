@@ -40,19 +40,12 @@ let runAction = { play: () => { }, stop: () => { } };
 let jumpAction = { play: () => { }, stop: () => { } };
 
 
-/**
- * Raycaster
- */
-const raycaster = new THREE.Raycaster()
 
-const mouse = new THREE.Vector2()
 
-let currentIntersect = null
 
-const rayOrigin = new THREE.Vector3(-3, 0, 0)
-const rayDirection = new THREE.Vector3(10, 0, 0)
-rayDirection.normalize()
-raycaster.set(rayOrigin, rayDirection)
+
+
+
 
 // const target 
 const proxy = new Proxy({ speed: 0 },
@@ -122,6 +115,10 @@ let tempBox = new THREE.Box3();
 let tempMat = new THREE.Matrix4();
 let tempSegment = new THREE.Line3();
 
+let tempVectorNormalized = new THREE.Vector3();
+let playerDirectionVector = new THREE.Vector3();
+
+let raycaster
 /**
  * Base
  */
@@ -144,10 +141,74 @@ let oldElapsedTime = 0;
  * Test cube
  */
 // const cube = new THREE.Mesh(
-//     new THREE.BoxGeometry(1, 1, 1),
+//     new THREE.BoxGeometry(4, 4, 4),
 //     new THREE.MeshBasicMaterial()
 // )
+// // cube.scale.setScalar(4)
+// cube.name = "test"
 // scene.add(cube)
+
+/**
+ * Raycaster
+ */
+raycaster = new THREE.Raycaster()
+raycaster.far = 1;
+
+const rayOrigin = new THREE.Vector3(-3, 0, 0)
+const rayDirection = new THREE.Vector3(1, 0, 0)
+rayDirection.normalize()
+raycaster.set(rayOrigin, rayDirection)
+
+
+let currentIntersect = null
+
+const dir = new THREE.Vector3(1, 2, 0);
+
+//normalize the direction vector (convert to vector of length 1)
+dir.normalize();
+
+const origin = new THREE.Vector3(0, 0, 0);
+const length = 1;
+const hex = 0xffff00;
+
+const arrowHelper = new THREE.ArrowHelper(dir, origin, length, hex);
+scene.add(arrowHelper);
+
+
+/**
+ * Objects
+ */
+const object1 = new THREE.Mesh(
+    new THREE.SphereGeometry(0.5, 16, 16),
+    new THREE.MeshBasicMaterial({ color: '#ff0000' })
+)
+object1.position.x = - 2
+
+const object2 = new THREE.Mesh(
+    new THREE.SphereGeometry(0.5, 16, 16),
+    new THREE.MeshBasicMaterial({ color: '#ff0000' })
+)
+
+const object3 = new THREE.Mesh(
+    new THREE.SphereGeometry(0.5, 16, 16),
+    new THREE.MeshBasicMaterial({ color: '#ff0000' })
+)
+object3.position.x = 2
+
+scene.add(object1, object2, object3)
+
+const object4 = new THREE.Mesh(
+    new THREE.SphereGeometry(2, 16, 16),
+    new THREE.MeshBasicMaterial({ color: '#ff0000' })
+)
+object4.position.set(4, 1, -4)
+object4.name = "normalize!!"
+object4.interact = () => {
+    console.log("interaction!");
+}
+scene.add(object4)
+
+const objectsToTest = [object1, object2, object3, object4]
 
 /**
  * Sizes
@@ -296,48 +357,10 @@ export default function Main() {
             jumpAction.clampWhenFinished = true;
             jumpAction.enable = true;
             idleAction.play();
-            // scene.add(scene2)
-            // const clips = gltf.animations || [];
-            // if (!scene2) {
-            //     // Valid, but not supported by this viewer.
-            //     throw new Error(
-            //         "This model contains no scene, and cannot be viewed here. However," +
-            //         " it may contain individual 3D resources."
-            //     );
-            // }
-            // player = scene2;
-            // // scene.add(player);
-            // obj.add(player);
-            // const animations = gltf.animations;
-            // mixer = new THREE.AnimationMixer(player);
-            // idleAction = mixer.clipAction(animations[0]);
-            // walkAction = mixer.clipAction(animations[3]);
-            // runAction = mixer.clipAction(animations[1]);
-            // idleAction.play();
+
         })
 
-        // 현재로서는 내 능력 밖...
-        // gltfLoader.load("models/jump.glb", (gltf) => {
-        //     // const scene = gltf.scene || gltf.scenes[0];
-        //     // console.log(scene)
-        //     const animations = gltf.animations;
-        //     console.log(animations)
-        //     jumpAction = mixer.clipAction(animations[0])
-        //     // scene.rotation.y = Math.PI;
-        //     // scene.position.y = -1.5
 
-
-        //     // scene.castShadow = true;
-        //     // scene.receiveShadow = true;
-
-        //     // updateAllMaterials(scene)
-
-        //     // player.add(scene)
-
-
-
-
-        // })
 
         scene.add(player);
         reset();
@@ -411,8 +434,11 @@ export default function Main() {
                     // }
                     jump()
                     break;
+                case 'KeyZ':
+                    interact();
+                    break;
                 default:
-                    console.log('what')
+
             }
 
         });
@@ -426,7 +452,7 @@ export default function Main() {
                 case 'KeyD': rgtPressed = false; break;
                 case 'KeyA': lftPressed = false; break;
                 default:
-                    console.log('what')
+
 
             }
 
@@ -434,167 +460,54 @@ export default function Main() {
 
     }
 
+    function interact() {
+        console.log("interact")
+
+        // playerDirectionVector.addVectors(player.position, tempVectorNormalized).normalize();
+        // console.log(player.position)
+        // console.log(tempVectorNormalized);
+        // raycaster.set(player.position, playerDirectionVector)
+
+        // console.log(player.position)
+        // console.log(tempVectorNormalized);
+        raycaster.set(player.position, tempVectorNormalized)
+
+        const intersects = raycaster.intersectObjects(objectsToTest)
+        console.log(intersects)
+        if (intersects.length > 0) {
+
+            intersects[0].object.interact();
+        }
+
+        arrowHelper.position.copy(player.position);
+        arrowHelper.setDirection(tempVectorNormalized)
+        // // console.log(intersects.length)
+    }
+
     function loadColliderEnvironment() {
 
-        //         gltfLoader.load('../models/dungeon_low_poly_game_level_challenge/scene.gltf', res => {
-        //             // gltfLoader.load('../models/TheRoom13.glb', res => {
-
-        //             // 여기서 , 걍 플레인 넣어보자 , 
-        //             const gltfScene = res.scene;
-        //             gltfScene.scale.setScalar(.01);
-        // // 
-        //             // const gltfScene = new THREE.Mesh(new THREE.PlaneGeometry(100, 100, 2, 2), new THREE.MeshNormalMaterial())
-        //             // gltfScene.scale.setScalar(.01);
-
-        //             // gltfScene.add(new THREE.Mesh(new THREE.PlaneGeometry(100, 100, 2, 2), new THREE.MeshBasicMaterial()))
-
-        //             const box = new THREE.Box3();
-        //             box.setFromObject(gltfScene);
-        //             box.getCenter(gltfScene.position).negate();
-        //             gltfScene.updateMatrixWorld(true);
-
-        //             // visual geometry setup
-        //             const toMerge = {};
-        //             gltfScene.traverse(c => {
-
-        //                 if (
-        //                     /Boss/.test(c.name) ||
-        //                     /Enemie/.test(c.name) ||
-        //                     /Shield/.test(c.name) ||
-        //                     /Sword/.test(c.name) ||
-        //                     /Character/.test(c.name) ||
-        //                     /Gate/.test(c.name) ||
-
-        //                     // spears
-        //                     /Cube/.test(c.name) ||
-
-        //                     // pink brick
-        //                     c.material && c.material.color.r === 1.0
-        //                 ) {
-
-        //                     return;
-
-        //                 }
-
-        //                 if (c.isMesh) {
-
-        //                     const hex = c.material.color.getHex();
-        //                     toMerge[hex] = toMerge[hex] || [];
-        //                     toMerge[hex].push(c);
-
-        //                 }
-
-        //             });
-
-        //             environment = new THREE.Group();
-        //             for (const hex in toMerge) {
-
-        //                 const arr = toMerge[hex];
-        //                 const visualGeometries = [];
-        //                 arr.forEach(mesh => {
-
-        //                     if (mesh.material.emissive.r !== 0) {
-
-        //                         environment.attach(mesh);
-
-        //                     } else {
-
-        //                         const geom = mesh.geometry.clone();
-        //                         geom.applyMatrix4(mesh.matrixWorld);
-        //                         visualGeometries.push(geom);
-
-        //                     }
-
-        //                 });
-
-        //                 if (visualGeometries.length) {
-
-        //                     const newGeom = BufferGeometryUtils.mergeBufferGeometries(visualGeometries);
-        //                     const newMesh = new THREE.Mesh(newGeom, new THREE.MeshStandardMaterial({ color: parseInt(hex), shadowSide: 2 }));
-        //                     newMesh.castShadow = true;
-        //                     newMesh.receiveShadow = true;
-        //                     newMesh.material.shadowSide = 2;
-
-        //                     environment.add(newMesh);
-
-        //                 }
-
-        //             }
-
-        //             // collect all geometries to merge
-        //             const geometries = [];
-        //             environment.updateMatrixWorld(true);
-        //             environment.traverse(c => {
-
-        //                 if (c.geometry) {
-
-        //                     const cloned = c.geometry.clone();
-        //                     cloned.applyMatrix4(c.matrixWorld);
-        //                     for (const key in cloned.attributes) {
-
-        //                         if (key !== 'position') {
-
-        //                             cloned.deleteAttribute(key);
-
-        //                         }
-
-        //                     }
-
-        //                     geometries.push(cloned);
-
-        //                 }
-
-        //             });
-
-        //             // 여기다가 커스텀 , plane 추가해보자 ...
-        //             // 메쉬 따로 , 콜리전 따로임 ...
-        //             // const testPlaneGeo = new THREE.PlaneGeometry(100,100);
-        //             // geometries.push(testPlaneGeo)
-
-        //             // create the merged geometry
-        //             const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(geometries, false);
-        //             mergedGeometry.boundsTree = new MeshBVH(mergedGeometry, { lazyGeneration: false });
-
-        //             collider = new THREE.Mesh(mergedGeometry);
-        //             collider.material.wireframe = true;
-        //             collider.material.opacity = 0.5;
-        //             collider.material.transparent = true;
-
-        //             visualizer = new MeshBVHVisualizer(collider, params.visualizeDepth);
-        //             scene.add(visualizer);
-        //             scene.add(collider);
-        //             scene.add(environment);
-
-        //         });
 
         // gltfLoader.load('../models/TheRoom13.glb', (res) => {
-        gltfLoader.load('../models/TheRoom8.glb', (res) => {
-            const gltfScene = res.scene;
-            scene.add(gltfScene)
-        })
-
-        // ground plane test
-        // const planeGeo = new THREE.PlaneGeometry(100, 100, 2, 2)
-        // planeGeo.rotateX(-Math.PI / 2)
-        // const plane = new THREE.Mesh(planeGeo, new THREE.MeshNormalMaterial())
-        // // plane.rotation.x = -Math.PI / 2
-        // plane.visible = false;
-        // scene.add(plane)
+        // gltfLoader.load('../models/TheRoom8.glb', (res) => {
+        //     const gltfScene = res.scene;
+        //     scene.add(gltfScene)
+        // })
 
 
         gltfLoader.load('../models/TheRoom_bsp1.glb', (res) => {
             const gltfScene = res.scene;
             console.log(gltfScene)
             const geo = gltfScene.children[0].geometry;
-            // scene.add(gltfScene)
-            // create the merged geometry
-            // const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(geometries, false);
+
             geo.boundsTree = new MeshBVH(geo, { lazyGeneration: false });
             collider = new THREE.Mesh(geo);
             collider.material.wireframe = true;
             collider.material.opacity = 0.5;
             collider.material.transparent = true;
             visualizer = new MeshBVHVisualizer(collider, params.visualizeDepth);
+
+            // objectsToTest.push(gltfScene)
+            scene.add(gltfScene)
             scene.add(visualizer);
             scene.add(collider);
             // scene.add(environment);
@@ -652,10 +565,17 @@ export default function Main() {
             tempVector.set(horizonAxis, 0, verticalAxis).applyAxisAngle(upVector, angle);
 
             const length = tempVector.length()
+            tempVectorNormalized.copy(tempVector).normalize()
             if (length > 0.5) {
-                tempVector.set(horizonAxis, 0, verticalAxis).applyAxisAngle(upVector, angle).normalize();
+                // tempVector.set(horizonAxis, 0, verticalAxis).applyAxisAngle(upVector, angle).normalize();
+                // new vec needs
+                // tempVectorNormalized.copy(tempVector).normalize()
+
+                player.position.addScaledVector(tempVectorNormalized, params.playerSpeed * delta);
+            } else {
+
+                player.position.addScaledVector(tempVector, params.playerSpeed * delta);
             }
-            player.position.addScaledVector(tempVector, params.playerSpeed * delta);
 
             player.rotation.y = Math.atan2(tempVector.x, tempVector.z)
             proxy.speed = length;
@@ -757,8 +677,75 @@ export default function Main() {
 
     function sceneInit() {
 
-        // Debug
-        // const gui = new GUI()
+        /**
+        * Raycaster
+        */
+        // raycaster = new THREE.Raycaster(player.position, playerDirectionVector, 0.3, 1)
+        // raycaster = new THREE.Raycaster(player.position, playerDirectionVector)
+
+
+        // const material = new THREE.LineBasicMaterial({
+        //     color: 0x0000ff
+        // });
+
+        // const points = [];
+        // points.push(player.position);
+        // points.push(tempVectorNormalized);
+        // // points.push( new THREE.Vector3( 10, 0, 0 ) );
+
+        // const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+        // const line = new THREE.Line(geometry, material);
+        // scene.add(line);
+
+        // setInterval(() => {
+        //     console.log("interact raycast shoot");
+        // }, 500)
+
+        /**
+ * Objects
+ */
+
+        // objectsToTest.push(object1)
+
+        // setInterval(interactRay, 1500)
+    }
+
+    function interactRay() {
+
+        // test cube 로 테스트 하자 .
+        // raycaster 한계선 설정 해놓기 ... ,far 값 ... 
+        // 큐브 크기 좀 키우고 ..
+        // z 값으로 조금 위로 ... 
+        //player.position + tempVectorNormalized 가 목적지 여야지 .. 
+        playerDirectionVector.addVectors(player.position, tempVectorNormalized)
+        raycaster.set(player.position, playerDirectionVector)
+
+        const material = new THREE.LineBasicMaterial({
+            color: 0x0000ff
+        });
+
+        const points = [];
+        points.push(player.position);
+        points.push(playerDirectionVector);
+        // points.push( new THREE.Vector3( 10, 0, 0 ) );
+
+        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+        const line = new THREE.Line(geometry, material);
+        scene.add(line);
+
+        // const objectsToTest = [object1, object2, object3]
+
+        console.log(objectsToTest)
+        const intersects = raycaster.intersectObjects(objectsToTest)
+        // interacting 할 오브젝트들은 따로 빼자 ...
+        // const intersects = raycaster.intersectObjects(scene.children)
+        console.log(intersects);
+        if (intersects.length !== 0) {
+
+            console.log(intersects[0])
+        }
     }
 
     function tick() {
@@ -780,6 +767,12 @@ export default function Main() {
         // const deltaTime = elapsedTime - oldElapsedTime
         const delta = elapsedTime - oldElapsedTime
         oldElapsedTime = elapsedTime
+
+
+        // Animate objects
+        object1.position.y = Math.sin(elapsedTime * 0.3) * 1.5
+        object2.position.y = Math.sin(elapsedTime * 0.8) * 1.5
+        object3.position.y = Math.sin(elapsedTime * 1.4) * 1.5
 
         // const delta = Math.min(clock.getDelta(), 0.1);
         if (params.firstPerson) {
@@ -817,6 +810,27 @@ export default function Main() {
         // raycast in direction of camera and move it if it's further than the closest point
 
         controls.update();
+
+
+
+
+        // playerDirectionVector.addVectors(player.position, tempVectorNormalized)
+        // raycaster.set(player.position, playerDirectionVector)
+
+
+        // const intersects = raycaster.intersectObjects(objectsToTest)
+        // // interacting 할 오브젝트들은 따로 빼자 ...
+        // // const intersects = raycaster.intersectObjects(scene.children)
+        // console.log(intersects);
+        // if (intersects.length !== 0) {
+
+        //     console.log(intersects[0])
+        // }
+
+
+
+
+
 
         renderer.render(scene, camera);
     }
