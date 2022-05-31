@@ -52,32 +52,20 @@ const proxy = new Proxy({ speed: 0 },
     {
         set(obj, prop, newval) {
 
-            // let oldval = obj[prop]
-
-            // if (newval > 0.2 && newval < 0.5) {
-            //     idleAction.stop()
-            //     runAction.stop()
-            //     walkAction.play()
-            // } else if (newval > 0.5) {
-            //     idleAction.stop();
-            //     walkAction.stop();
-            //     runAction.play()
-            // }
-            // 이거 이하는 살금 살금?
+            
             if (newval >= 0.1 && newval <= 0.5) {
-                // newval = 0.35
+              
                 idleAction.stop()
                 runAction.stop()
-                // walkAction.reset()
+               
                 walkAction.play()
-                // walkAction.crossFadeFrom(idleAction,1)
-                // 애니메이션 수업 듣기 전에는 하지말자 .
+               
             } else if (newval > 0.5) {
-                // newval = 1;
+
                 idleAction.stop();
                 walkAction.stop();
                 runAction.play()
-            } else if(newval < 0.1){
+            } else if (newval < 0.1) {
                 walkAction.stop()
                 runAction.stop()
             }
@@ -183,28 +171,10 @@ scene.add(arrowHelper);
 /**
  * Objects
  */
-const object1 = new THREE.Mesh(
-    new THREE.SphereGeometry(0.5, 16, 16),
-    new THREE.MeshBasicMaterial({ color: '#ff0000' })
-)
-object1.position.x = - 2
-
-const object2 = new THREE.Mesh(
-    new THREE.SphereGeometry(0.5, 16, 16),
-    new THREE.MeshBasicMaterial({ color: '#ff0000' })
-)
-
-const object3 = new THREE.Mesh(
-    new THREE.SphereGeometry(0.5, 16, 16),
-    new THREE.MeshBasicMaterial({ color: '#ff0000' })
-)
-object3.position.x = 2
-
-scene.add(object1, object2, object3)
-
+// desk 추가 ..
 const object4 = new THREE.Mesh(
     new THREE.SphereGeometry(2, 16, 16),
-    new THREE.MeshBasicMaterial({ color: '#ff0000' })
+    new THREE.MeshBasicMaterial({ color: '#ff0000', wireframe:true })
 )
 object4.position.set(4, 1, -4)
 object4.name = "normalize!!"
@@ -213,7 +183,7 @@ object4.interact = () => {
 }
 scene.add(object4)
 
-const objectsToTest = [object1, object2, object3, object4]
+const objectsToTest = [object4]
 
 /**
  * Sizes
@@ -232,34 +202,7 @@ export default function Main() {
         sceneInit();
         tick();
 
-        let manager = nipplejs.create({
-            zone: joystickConRef.current,
-            mode: 'semi',
-            // mode: 'static',
-            // position: { left: '10%', top: '90%' },
-            // color: 'red'
-        });
-
-        manager.on("move", function (evt, { vector }) {
-            const { x, y } = vector;
-            // console.log(vector)
-            // set({ controls: { horizonAxis: -x, verticalAxis: y } })
-            // 여기서도 0.5 이상이면 1을 넣는 ??
-            horizonAxis = x;
-            verticalAxis = -y;
-            // runAction.play();
-            // idleAction.stop();
-        });
-
-        manager.on("end", function (evt, data) {
-
-            // set({ controls: { horizonAxis: 0, verticalAxis: 0 } })
-            horizonAxis = 0;
-            verticalAxis = 0;
-            runAction.stop();
-            walkAction.stop();
-            idleAction.play();
-        });
+       
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -383,15 +326,27 @@ export default function Main() {
                     .multiplyScalar(10)
                     .add(controls.target);
 
+                controls.maxPolarAngle = Math.PI / 2;
+                controls.minDistance = 1;
+                controls.maxDistance = 20;
+
             } else {
                 player.visible = false;
+
+                controls.maxPolarAngle = Math.PI;
+                controls.minDistance = 1e-4;
+                controls.maxDistance = 1e-4;
             }
 
         });
 
         const visFolder = gui.addFolder('Visualization');
-        visFolder.add(params, 'displayCollider');
-        visFolder.add(params, 'displayBVH');
+        visFolder.add(params, 'displayCollider').onChange(v=>{
+            collider.visible = v;
+        });
+        visFolder.add(params, 'displayBVH').onChange(v=>{
+            visualizer.visible = v
+        });;
         visFolder.add(params, 'visualizeDepth', 1, 20, 1).onChange(v => {
 
             visualizer.depth = v;
@@ -511,6 +466,9 @@ export default function Main() {
             collider.material.transparent = true;
             visualizer = new MeshBVHVisualizer(collider, params.visualizeDepth);
 
+            collider.visible = false
+            visualizer.visible = false
+
             // objectsToTest.push(gltfScene)
             // scene.add(gltfScene)
             scene.add(visualizer);
@@ -577,9 +535,11 @@ export default function Main() {
                 // tempVectorNormalized.copy(tempVector).normalize()
 
                 player.position.addScaledVector(tempVectorNormalized, params.playerSpeed * delta);
-            } else if(length > 0.1 && length <= 0.5) {
+
+            } else if (length >= 0.1 && length <= 0.5) {
                 tempVectorWalkSpeed.copy(tempVectorNormalized).multiplyScalar(0.35)
                 player.position.addScaledVector(tempVectorWalkSpeed, params.playerSpeed * delta);
+
             }
 
             player.rotation.y = Math.atan2(tempVector.x, tempVector.z)
@@ -682,38 +642,36 @@ export default function Main() {
 
     function sceneInit() {
 
-        /**
-        * Raycaster
-        */
-        // raycaster = new THREE.Raycaster(player.position, playerDirectionVector, 0.3, 1)
-        // raycaster = new THREE.Raycaster(player.position, playerDirectionVector)
-
-
-        // const material = new THREE.LineBasicMaterial({
-        //     color: 0x0000ff
-        // });
-
-        // const points = [];
-        // points.push(player.position);
-        // points.push(tempVectorNormalized);
-        // // points.push( new THREE.Vector3( 10, 0, 0 ) );
-
-        // const geometry = new THREE.BufferGeometry().setFromPoints(points);
-
-        // const line = new THREE.Line(geometry, material);
-        // scene.add(line);
-
-        // setInterval(() => {
-        //     console.log("interact raycast shoot");
-        // }, 500)
-
-        /**
- * Objects
- */
-
-        // objectsToTest.push(object1)
-
         // setInterval(interactRay, 1500)
+
+        let manager = nipplejs.create({
+            zone: joystickConRef.current,
+            mode: 'semi',
+            // mode: 'static',
+            // position: { left: '10%', top: '90%' },
+            // color: 'red'
+        });
+
+        manager.on("move", function (evt, { vector }) {
+            const { x, y } = vector;
+            // console.log(vector)
+            // set({ controls: { horizonAxis: -x, verticalAxis: y } })
+            // 여기서도 0.5 이상이면 1을 넣는 ??
+            horizonAxis = x;
+            verticalAxis = -y;
+            // runAction.play();
+            // idleAction.stop();
+        });
+
+        manager.on("end", function (evt, data) {
+
+            // set({ controls: { horizonAxis: 0, verticalAxis: 0 } })
+            horizonAxis = 0;
+            verticalAxis = 0;
+            runAction.stop();
+            walkAction.stop();
+            idleAction.play();
+        });
     }
 
     function interactRay() {
@@ -726,26 +684,10 @@ export default function Main() {
         playerDirectionVector.addVectors(player.position, tempVectorNormalized)
         raycaster.set(player.position, playerDirectionVector)
 
-        const material = new THREE.LineBasicMaterial({
-            color: 0x0000ff
-        });
-
-        const points = [];
-        points.push(player.position);
-        points.push(playerDirectionVector);
-        // points.push( new THREE.Vector3( 10, 0, 0 ) );
-
-        const geometry = new THREE.BufferGeometry().setFromPoints(points);
-
-        const line = new THREE.Line(geometry, material);
-        scene.add(line);
-
         // const objectsToTest = [object1, object2, object3]
 
         console.log(objectsToTest)
         const intersects = raycaster.intersectObjects(objectsToTest)
-        // interacting 할 오브젝트들은 따로 빼자 ...
-        // const intersects = raycaster.intersectObjects(scene.children)
         console.log(intersects);
         if (intersects.length !== 0) {
 
@@ -754,50 +696,19 @@ export default function Main() {
     }
 
     function tick() {
-        // const elapsedTime = clock.getElapsedTime();
-
-        // // Update controls
-        // controls.update();
-
-        // // Render
-        // renderer.render(scene, camera);
-
-        // // Call tick again on the next frame
-        // requestAnimationFrame(tick);
 
         stats.update();
         requestAnimationFrame(tick);
 
-        const elapsedTime = clock.getElapsedTime();
-        // const deltaTime = elapsedTime - oldElapsedTime
-        const delta = elapsedTime - oldElapsedTime
-        oldElapsedTime = elapsedTime
+        // const elapsedTime = clock.getElapsedTime();
+        // const delta = elapsedTime - oldElapsedTime
+        // oldElapsedTime = elapsedTime
 
+        const delta = Math.min(clock.getDelta(), 0.1);
 
-        // Animate objects
-        object1.position.y = Math.sin(elapsedTime * 0.3) * 1.5
-        object2.position.y = Math.sin(elapsedTime * 0.8) * 1.5
-        object3.position.y = Math.sin(elapsedTime * 1.4) * 1.5
-
-        // const delta = Math.min(clock.getDelta(), 0.1);
-        if (params.firstPerson) {
-
-            controls.maxPolarAngle = Math.PI;
-            controls.minDistance = 1e-4;
-            controls.maxDistance = 1e-4;
-
-        } else {
-
-            controls.maxPolarAngle = Math.PI / 2;
-            controls.minDistance = 1;
-            controls.maxDistance = 20;
-
-        }
+        
 
         if (collider) {
-
-            collider.visible = params.displayCollider;
-            visualizer.visible = params.displayBVH;
 
             const physicsSteps = params.physicsSteps;
 
