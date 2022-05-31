@@ -110,7 +110,7 @@ let tempSegment = new THREE.Line3();
 
 let tempVectorNormalized = new THREE.Vector3();
 let tempVectorWalkSpeed = new THREE.Vector3();
-let playerDirectionVector = new THREE.Vector3();
+// let playerDirectionVector = new THREE.Vector3();
 
 let raycaster
 /**
@@ -124,7 +124,7 @@ const scene = new THREE.Scene()
 // scene.add(new THREE.AxesHelper(5))
 
 const clock = new THREE.Clock()
-let oldElapsedTime = 0;
+// let oldElapsedTime = 0;
 
 /**
  * Textures
@@ -143,7 +143,7 @@ rayDirection.normalize()
 raycaster.set(rayOrigin, rayDirection)
 
 
-let currentIntersect = null
+// let currentIntersect = null
 
 const dir = new THREE.Vector3(1, 2, 0);
 
@@ -674,9 +674,11 @@ export default function Main() {
 
         let manager = nipplejs.create({
             zone: joystickConRef.current,
-            mode: 'semi',
-            // mode: 'static',
-            // position: { left: '10%', top: '90%' },
+            // mode: 'semi',
+            mode: 'static',
+            // position: { left: '15%', top: '90%' },
+            //px 로가자
+            position: { left: '100px', bottom: '50px' },
             // color: 'red'
         });
 
@@ -702,26 +704,26 @@ export default function Main() {
         });
     }
 
-    function interactRay() {
+    // function interactRay() {
 
-        // test cube 로 테스트 하자 .
-        // raycaster 한계선 설정 해놓기 ... ,far 값 ... 
-        // 큐브 크기 좀 키우고 ..
-        // z 값으로 조금 위로 ... 
-        //player.position + tempVectorNormalized 가 목적지 여야지 .. 
-        playerDirectionVector.addVectors(player.position, tempVectorNormalized)
-        raycaster.set(player.position, playerDirectionVector)
+    //     // test cube 로 테스트 하자 .
+    //     // raycaster 한계선 설정 해놓기 ... ,far 값 ... 
+    //     // 큐브 크기 좀 키우고 ..
+    //     // z 값으로 조금 위로 ... 
+    //     //player.position + tempVectorNormalized 가 목적지 여야지 .. 
+    //     playerDirectionVector.addVectors(player.position, tempVectorNormalized)
+    //     raycaster.set(player.position, playerDirectionVector)
 
-        // const objectsToTest = [object1, object2, object3]
+    //     // const objectsToTest = [object1, object2, object3]
 
-        console.log(objectsToTest)
-        const intersects = raycaster.intersectObjects(objectsToTest)
-        console.log(intersects);
-        if (intersects.length !== 0) {
+    //     console.log(objectsToTest)
+    //     const intersects = raycaster.intersectObjects(objectsToTest)
+    //     console.log(intersects);
+    //     if (intersects.length !== 0) {
 
-            console.log(intersects[0])
-        }
-    }
+    //         console.log(intersects[0])
+    //     }
+    // }
 
     function tick() {
 
