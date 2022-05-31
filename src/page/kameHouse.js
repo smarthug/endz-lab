@@ -55,7 +55,7 @@ scene.background = cubeTextureLoader.setPath('textures/cubeMaps/toonSky/').load(
 //     'pz.png',
 //     'nz.png'
 // ])
-console.log("wtf")
+
 // console.log(background)
 
 // Sizes
