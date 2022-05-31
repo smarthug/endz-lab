@@ -80,6 +80,7 @@ const proxy = new Proxy({ speed: 0 },
 const params = {
 
     firstPerson: false,
+    helpers:false,
 
     displayCollider: false,
     displayBVH: false,
@@ -131,17 +132,6 @@ let oldElapsedTime = 0;
 // const textureLoader = new THREE.TextureLoader()
 
 /**
- * Test cube
- */
-// const cube = new THREE.Mesh(
-//     new THREE.BoxGeometry(4, 4, 4),
-//     new THREE.MeshBasicMaterial()
-// )
-// // cube.scale.setScalar(4)
-// cube.name = "test"
-// scene.add(cube)
-
-/**
  * Raycaster
  */
 raycaster = new THREE.Raycaster()
@@ -165,6 +155,7 @@ const length = 1;
 const hex = 0xffff00;
 
 const arrowHelper = new THREE.ArrowHelper(dir, origin, length, hex);
+arrowHelper.visible = false;
 scene.add(arrowHelper);
 
 
@@ -172,18 +163,44 @@ scene.add(arrowHelper);
  * Objects
  */
 // desk 추가 ..
-const object4 = new THREE.Mesh(
-    new THREE.SphereGeometry(2, 16, 16),
-    new THREE.MeshBasicMaterial({ color: '#ff0000', wireframe:true })
-)
-object4.position.set(4, 1, -4)
-object4.name = "normalize!!"
-object4.interact = () => {
-    console.log("interaction!");
-}
-scene.add(object4)
+// const object4 = new THREE.Mesh(
+//     new THREE.SphereGeometry(2, 16, 16),
+//     new THREE.MeshBasicMaterial({ color: '#ff0000', wireframe:true })
+// )
+// object4.position.set(4, 1, -4)
+// object4.name = "normalize!!"
+// object4.interact = () => {
+//     console.log("interaction!");
+// }
+// scene.add(object4)
 
-const objectsToTest = [object4]
+const desktop = new THREE.Mesh(
+    new THREE.BoxGeometry(3,2,1),
+    new THREE.MeshBasicMaterial({wireframe:true})
+)
+
+desktop.position.set(5, 2, -14.5)
+desktop.name = "desktop"
+desktop.interact = () => {
+    console.log("desktop interaction!");
+}
+desktop.visible = false
+scene.add(desktop)
+
+const bed = new THREE.Mesh(
+    new THREE.BoxGeometry(2,2,2.5),
+    new THREE.MeshBasicMaterial({wireframe:true})
+)
+
+bed.position.set(5, 1, -1.5)
+bed.name = "bed"
+bed.interact = () => {
+    console.log("bed interaction!");
+}
+bed.visible = false
+scene.add(bed)
+
+const objectsToTest = [desktop,bed]
 
 /**
  * Sizes
@@ -339,6 +356,11 @@ export default function Main() {
             }
 
         });
+        gui.add(params, 'helpers').onChange(v=>{
+            arrowHelper.visible = v
+            desktop.visible = v
+            bed.visible = v
+        })
 
         const visFolder = gui.addFolder('Visualization');
         visFolder.add(params, 'displayCollider').onChange(v=>{
@@ -493,6 +515,8 @@ export default function Main() {
 
             player.rotation.y = Math.atan2(tempVector.x, tempVector.z)
 
+            // proxy.speed = tempVector.length();
+
         }
 
         if (bkdPressed) {
@@ -502,6 +526,7 @@ export default function Main() {
 
             player.rotation.y = Math.atan2(tempVector.x, tempVector.z)
 
+            // proxy.speed = tempVector.length();
         }
 
         if (lftPressed) {
@@ -511,6 +536,7 @@ export default function Main() {
 
             player.rotation.y = Math.atan2(tempVector.x, tempVector.z)
 
+            // proxy.speed = tempVector.length();
         }
 
         if (rgtPressed) {
@@ -520,6 +546,8 @@ export default function Main() {
 
 
             player.rotation.y = Math.atan2(tempVector.x, tempVector.z)
+
+            // proxy.speed = tempVector.length();
         }
 
         if (horizonAxis !== 0 && verticalAxis !== 0) {
