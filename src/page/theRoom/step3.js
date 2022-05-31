@@ -65,6 +65,7 @@ const proxy = new Proxy({ speed: 0 },
             // }
             // 이거 이하는 살금 살금?
             if (newval > 0.1 && newval < 0.5) {
+                newval = 0.35
                 idleAction.stop()
                 runAction.stop()
                 // walkAction.reset()
@@ -116,6 +117,7 @@ let tempMat = new THREE.Matrix4();
 let tempSegment = new THREE.Line3();
 
 let tempVectorNormalized = new THREE.Vector3();
+let tempVectorWalkSpeed = new THREE.Vector3();
 let playerDirectionVector = new THREE.Vector3();
 
 let raycaster
@@ -572,9 +574,9 @@ export default function Main() {
                 // tempVectorNormalized.copy(tempVector).normalize()
 
                 player.position.addScaledVector(tempVectorNormalized, params.playerSpeed * delta);
-            } else {
-
-                player.position.addScaledVector(tempVector, params.playerSpeed * delta);
+            } else if(length > 0.1 && length < 0.5) {
+                tempVectorWalkSpeed.copy(tempVectorNormalized).multiplyScalar(0.35)
+                player.position.addScaledVector(tempVectorWalkSpeed, params.playerSpeed * delta);
             }
 
             player.rotation.y = Math.atan2(tempVector.x, tempVector.z)
@@ -810,22 +812,6 @@ export default function Main() {
         // raycast in direction of camera and move it if it's further than the closest point
 
         controls.update();
-
-
-
-
-        // playerDirectionVector.addVectors(player.position, tempVectorNormalized)
-        // raycaster.set(player.position, playerDirectionVector)
-
-
-        // const intersects = raycaster.intersectObjects(objectsToTest)
-        // // interacting 할 오브젝트들은 따로 빼자 ...
-        // // const intersects = raycaster.intersectObjects(scene.children)
-        // console.log(intersects);
-        // if (intersects.length !== 0) {
-
-        //     console.log(intersects[0])
-        // }
 
 
 
