@@ -52,14 +52,14 @@ const proxy = new Proxy({ speed: 0 },
     {
         set(obj, prop, newval) {
 
-            
+
             if (newval >= 0.1 && newval <= 0.5) {
-              
+
                 idleAction.stop()
                 runAction.stop()
-               
+
                 walkAction.play()
-               
+
             } else if (newval > 0.5) {
 
                 idleAction.stop();
@@ -80,7 +80,7 @@ const proxy = new Proxy({ speed: 0 },
 const params = {
 
     firstPerson: false,
-    helpers:false,
+    helpers: false,
 
     displayCollider: false,
     displayBVH: false,
@@ -175,8 +175,8 @@ scene.add(arrowHelper);
 // scene.add(object4)
 
 const desktop = new THREE.Mesh(
-    new THREE.BoxGeometry(3,2,1),
-    new THREE.MeshBasicMaterial({wireframe:true})
+    new THREE.BoxGeometry(3, 2, 1),
+    new THREE.MeshBasicMaterial({ wireframe: true })
 )
 
 desktop.position.set(5, 2, -14.5)
@@ -188,8 +188,8 @@ desktop.visible = false
 scene.add(desktop)
 
 const bed = new THREE.Mesh(
-    new THREE.BoxGeometry(2,2,2.5),
-    new THREE.MeshBasicMaterial({wireframe:true})
+    new THREE.BoxGeometry(2, 2, 2.5),
+    new THREE.MeshBasicMaterial({ wireframe: true })
 )
 
 bed.position.set(5, 1, -1.5)
@@ -200,7 +200,7 @@ bed.interact = () => {
 bed.visible = false
 scene.add(bed)
 
-const objectsToTest = [desktop,bed]
+const objectsToTest = [desktop, bed]
 
 /**
  * Sizes
@@ -219,7 +219,7 @@ export default function Main() {
         sceneInit();
         tick();
 
-       
+
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -356,17 +356,17 @@ export default function Main() {
             }
 
         });
-        gui.add(params, 'helpers').onChange(v=>{
+        gui.add(params, 'helpers').onChange(v => {
             arrowHelper.visible = v
             desktop.visible = v
             bed.visible = v
         })
 
         const visFolder = gui.addFolder('Visualization');
-        visFolder.add(params, 'displayCollider').onChange(v=>{
+        visFolder.add(params, 'displayCollider').onChange(v => {
             collider.visible = v;
         });
-        visFolder.add(params, 'displayBVH').onChange(v=>{
+        visFolder.add(params, 'displayBVH').onChange(v => {
             visualizer.visible = v
         });;
         visFolder.add(params, 'visualizeDepth', 1, 20, 1).onChange(v => {
@@ -389,7 +389,8 @@ export default function Main() {
         physicsFolder.open();
 
         gui.add(params, 'reset');
-        gui.open();
+        // gui.open();
+        gui.close()
 
         window.addEventListener('resize', function () {
 
@@ -736,7 +737,7 @@ export default function Main() {
 
         const delta = Math.min(clock.getDelta(), 0.1);
 
-        
+
 
         if (collider) {
 
@@ -815,8 +816,19 @@ export default function Main() {
                 // height: "100px",
             }}
         >
-            <Fab color="primary" onClick={jump}>
-                Jump
+            <Fab style={{
+                position: "absolute",
+                right: "64px",
+                bottom:"8px"
+            }} color="primary" onClick={jump}>
+                B
+            </Fab>
+            <Fab style={{
+                position: "absolute",
+                bottom: "64px",
+                right: "8px",
+            }} color="primary" onClick={interact}>
+                A
             </Fab>
         </div>
         <canvas ref={canvasRef} className="webgl"></canvas>;
