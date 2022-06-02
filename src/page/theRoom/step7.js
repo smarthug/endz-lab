@@ -15,7 +15,7 @@ import { MeshBVH, MeshBVHVisualizer } from 'three-mesh-bvh';
 
 import nipplejs from 'nipplejs'
 
-import { Fab, IconButton } from '@mui/material'
+import { Fab, IconButton, TextField } from '@mui/material'
 // import DeleteIcon from '@mui/icons-material/Delete';
 import ShareIcon from '@mui/icons-material/Share';
 
@@ -799,12 +799,29 @@ export default function Main() {
         <div>
             <div className="navbar" style={{
                 "position": "absolute",
-                "top": "0px",
-                "right": "280px",
+                "top": "20px",
+                "right": "20px",
                 "zIndex": "999",
                 "color": "white",
+                "marginTop": "20px",
+                "padding":"5px"
             }}>
-
+                <TextField
+                    id="outlined-read-only-input"
+                    label="소지금"
+                    defaultValue="50,000,000 원"
+                    InputProps={{
+                        readOnly: true,
+                    }}
+                    sx={{input:{color:'white'}}}
+                    color="warning"
+                    focused
+                    style={{
+                        "width": "160px",
+                        // "marginTop":"20px",
+                        "color": "white"
+                    }}
+                />
                 <IconButton onClick={share} size="large" aria-label="delete">
                     <ShareIcon fontSize="inherit" style={{
                         "color": "white",

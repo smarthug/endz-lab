@@ -207,7 +207,7 @@ const itemData = [
     },
     {
         img: 'https://images.unsplash.com/photo-1589118949245-7d38baf380d6',
-        title: 'Bike',
+        title: 'Go Outside/외출',
         author: '@southside_customs',
         cols: 2,
     },
