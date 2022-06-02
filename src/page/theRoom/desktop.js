@@ -210,6 +210,7 @@ const itemData = [
         title: 'Go Outside/외출',
         author: '@southside_customs',
         cols: 2,
+        url:'https://endz-lab.vercel.app/City'
     },
 ];
 
