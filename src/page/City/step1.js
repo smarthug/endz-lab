@@ -282,7 +282,7 @@ export default function Main() {
         // clock = new THREE.Clock();
 
         controls = new OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
+        // controls.enableDamping = true;
         // stats setup
         stats = new Stats();
         document.body.appendChild(stats.dom);
@@ -928,7 +928,7 @@ export default function Main() {
 function reset() {
 
     playerVelocity.set(0, 0, 0);
-    player.position.set(3, 20, -6);
+    player.position.set(3, 2, -6);
     // player.position.set(15.75, - 3, 30);
     camera.position.sub(controls.target);
     controls.target.copy(player.position);
