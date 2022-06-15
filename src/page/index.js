@@ -11,5 +11,5 @@ export * as MyUniverse from './myUniverse'
 
 export * as Pysics2DGame from './Physics2DGame/step7_flying'
 export * as NoPhysicsGame from './NoPhysicsGame/step5'
-export * as TheRoom from './theRoom/step7'
+export * as TheRoom from './theRoom/step8'
 export * as City from './City/step1'
