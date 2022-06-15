@@ -21,6 +21,31 @@ export default function Loader(path) {
             }
 
             resolve(scene);
+            // resolve(gltf);
+        });
+    });
+}
+
+
+export  function Loader2(path) {
+    const loader = new GLTFLoader()
+        .setDRACOLoader(new DRACOLoader().setDecoderPath("assets/wasm/"))
+        .setKTX2Loader(new KTX2Loader().setTranscoderPath("assets/wasm/"))
+        .setMeshoptDecoder(MeshoptDecoder);
+
+    return new Promise((resolve) => {
+        loader.load(path, (gltf) => {
+            // console.log(gltf)
+            const scene = gltf.scene || gltf.scenes[0];
+            if (!scene) {
+                throw new Error(
+                    "This model contains no scene, and cannot be viewed here. However," +
+                    " it may contain individual 3D resources."
+                );
+            }
+
+            // resolve(scene);
+            resolve(gltf);
         });
     });
 }
