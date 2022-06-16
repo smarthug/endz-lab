@@ -12,7 +12,6 @@ import portalFragmentShader from './shaders/portal/fragment.js'
 
 import {Loader2} from '../../util/glbLoader'
 
-console.log(portalVertexShader)
 
 let renderer, camera, controls;
 
