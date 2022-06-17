@@ -69,7 +69,7 @@ let jumpAction = { play: () => { }, stop: () => { } };
  * Loaders
  */
 // Texture loader
-const textureLoader = new THREE.TextureLoader()
+// const textureLoader = new THREE.TextureLoader()
 
 // Draco loader
 // const dracoLoader = new DRACOLoader()
@@ -108,7 +108,7 @@ const textureLoader = new THREE.TextureLoader()
 
 // scene.add(cube)
 
-let firefliesMaterial
+// let firefliesMaterial
 
 
 
@@ -180,7 +180,7 @@ const scene = new THREE.Scene()
 // scene.add(new THREE.AxesHelper(5))
 
 const clock = new THREE.Clock()
-let oldElapsedTime = 0;
+// let oldElapsedTime = 0;
 
 /**
  * Textures
@@ -333,7 +333,8 @@ export default function Main() {
         // camera setup
         camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 99999);
         // camera.position.set(10, 10, - 10);
-        camera.position.set(-4, 2, 0);
+        // camera.position.set(-4, 2, 0);
+        camera.position.set(0, 2, 8);
         // camera.far = 100;
         camera.updateProjectionMatrix();
         window.camera = camera;
@@ -863,7 +864,7 @@ export default function Main() {
         // oldElapsedTime = elapsedTime
 
         const delta = Math.min(clock.getDelta(), 0.1);
-        oldElapsedTime += delta
+        // oldElapsedTime += delta
 
 
         if (collider) {

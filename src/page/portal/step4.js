@@ -353,7 +353,8 @@ export default function Main() {
         // camera setup
         camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 99999);
         // camera.position.set(10, 10, - 10);
-        camera.position.set(-4, 2, 0);
+        // camera.position.set(-4, 2, 0);
+        camera.position.set(0, 2, 8);
         // camera.far = 100;
         camera.updateProjectionMatrix();
         window.camera = camera;
