@@ -25,7 +25,8 @@ import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 
 
-
+import portalVertexShader from './shaders/portal/vertex.js'
+import portalFragmentShader from './shaders/portal/fragment.js'
 
 
 
@@ -46,6 +47,9 @@ const params = {
     reset: reset,
 
 };
+// Portal Light material
+params.portalColorStart = '#ff4d4d'
+params.portalColorEnd = '#fedcfb'
 const gui = new GUI();
 
 const gltfLoader = new GLTFLoader()
@@ -95,7 +99,15 @@ let jumpAction = { play: () => { }, stop: () => { } };
 // const bakedMaterial = new THREE.MeshBasicMaterial({ map: bakedTexture })
 
 
-
+const portalLightMaterial = new THREE.ShaderMaterial({
+    uniforms: {
+        uTime: { value: 0 },
+        uColorStart: { value: new THREE.Color(params.portalColorStart) },
+        uColorEnd: { value: new THREE.Color(params.portalColorEnd) },
+    },
+    vertexShader: portalVertexShader,
+    fragmentShader: portalFragmentShader
+})
 
 
 /**
@@ -180,7 +192,7 @@ const scene = new THREE.Scene()
 // scene.add(new THREE.AxesHelper(5))
 
 const clock = new THREE.Clock()
-// let oldElapsedTime = 0;
+let oldElapsedTime = 0;
 
 /**
  * Textures
@@ -256,7 +268,13 @@ scene.add(arrowHelper);
 // portalEvent.visible = false
 // scene.add(portalEvent)
 
-const objectsToTest = []
+const portalGeo = new THREE.PlaneGeometry(8, 8);
+const portal = new THREE.Mesh(portalGeo, portalLightMaterial)
+// portal.position.set(-25, 4 , 20)
+portal.position.set(0, 4, -20)
+scene.add(portal)
+
+const objectsToTest = [portal]
 
 /**
  * Sizes
@@ -499,7 +517,10 @@ export default function Main() {
 
             // 텔레포트 ㄱ 
             // window.open('https://endz-lab.vercel.app/City',"_self")
-            console.log("interacted")
+            // console.log("interacted")
+
+            // 텔레포트 ㄱ 
+            window.open('https://endz-lab.vercel.app/portal', "_self")
         }
     }
 
@@ -577,6 +598,10 @@ export default function Main() {
 
 
         })
+
+        // temp portal
+
+
 
 
         // gltfLoader.load('../models/portal_bsp3.glb', (res) => {
@@ -863,8 +888,10 @@ export default function Main() {
         // const delta = elapsedTime - oldElapsedTime
         // oldElapsedTime = elapsedTime
 
+        portalLightMaterial.uniforms.uTime.value = oldElapsedTime
+
         const delta = Math.min(clock.getDelta(), 0.1);
-        // oldElapsedTime += delta
+        oldElapsedTime += delta
 
 
         if (collider) {

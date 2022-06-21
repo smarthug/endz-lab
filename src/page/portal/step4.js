@@ -516,7 +516,7 @@ export default function Main() {
         if (intersects.length > 0) {
 
             // 텔레포트 ㄱ 
-            window.open('https://endz-lab.vercel.app/City',"_self")
+            window.open('https://endz-lab.vercel.app/HyperbolicTimeChamber',"_self")
         }
     }
 
