@@ -367,7 +367,7 @@ export default function Main() {
         // player.receiveShadow = true;
         // player.material.shadowSide = 2;
 
-        
+
 
 
 
@@ -562,7 +562,7 @@ export default function Main() {
         })
 
         // gltfLoader.load('../models/TheRoom13.glb', (res) => {
-        gltfLoader.load('../models/time_chamber3.glb', (gltf) => {
+        gltfLoader.load('../models/time_chamber_material5.glb', (gltf) => {
             const gltfScene = gltf.scene;
             // const bakedMesh = gltf.scene.children.find(child => child.name === 'baked')
 
@@ -609,13 +609,13 @@ export default function Main() {
         geo.rotateX(-Math.PI / 2)
 
         const mat = new THREE.MeshStandardMaterial({
-            color:0xe6e6e6,
-            roughness:1.0,
+            color: 0xe6e6e6,
+            roughness: 1.0,
             // metalness:0.3,
         })
         console.log(mat);
 
-        
+
         const plane = new THREE.Mesh(geo, mat)
         // plane.rotation.x = -Math.PI / 2
         plane.visible = true;
@@ -636,8 +636,8 @@ export default function Main() {
         scene.add(collider);
         scene.add(plane)
 
-        gui.add(mat,'roughness').min(0).max(1).step(0.001)
-        gui.add(mat,'metalness').min(0).max(1).step(0.001)
+        gui.add(mat, 'roughness').min(0).max(1).step(0.001)
+        gui.add(mat, 'metalness').min(0).max(1).step(0.001)
         gui.addColor(mat, 'color')
 
 
